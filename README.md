@@ -1,1 +1,1 @@
-# FutureForms.full
+# The full futureforms library, including visual components
