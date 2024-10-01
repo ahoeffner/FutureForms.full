@@ -19,13 +19,27 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Record } from "./Record.js";
+import { Parser } from './Parser.js';
+import { Form as Parent } from '../public/Form.js';
 
-/**
- * The Source class represents a source of data used
- * by a section in the form
- */
-export abstract class Source
+export class Form
 {
-   private records$:Record[] = [];
+   constructor(private parent:Parent, view?:HTMLElement|string)
+   {
+      if (view) this.setView(view);
+   }
+
+
+   public async setView(view:HTMLElement|string) : Promise<void>
+   {
+      if (typeof view === "string")
+      {
+         let html:string = view;
+         view = document.createElement("form");
+         view.innerHTML = html;
+      }
+
+      let parser:Parser = new Parser();
+      parser.parse(this.parent,view);
+   }
 }

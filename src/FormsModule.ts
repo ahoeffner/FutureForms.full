@@ -19,13 +19,37 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Record } from "./Record.js";
 
-/**
- * The Source class represents a source of data used
- * by a section in the form
- */
-export abstract class Source
+import { Parser } from './view/Parser.js';
+import { EventHandler } from './events/EventHandler.js';
+import { FormsModule as FormsModuleCore} from 'futureforms';
+
+export class FormsModule extends FormsModuleCore
 {
-   private records$:Record[] = [];
+	public static version() : string
+   {
+      return(FormsModuleCore.version());
+   }
+
+
+	public static language() : string
+	{
+		return(FormsModuleCore.Language);
+	}
+
+
+	public static async initialize() : Promise<void>
+	{
+		EventHandler.initialize();
+
+		new Parser().parse(null,document.body);
+
+		let elem:HTMLElement = document.querySelector("[name='country_id']");
+
+		elem.addEventListener("focusin", (event) =>
+		{
+			console.log("elem focus");
+			event.stopPropagation();
+		})
+	}
 }

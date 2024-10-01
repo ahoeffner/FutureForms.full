@@ -19,13 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Record } from "./Record.js";
-
-/**
- * The Source class represents a source of data used
- * by a section in the form
- */
-export abstract class Source
+export abstract class Tag
 {
-   private records$:Record[] = [];
+   public abstract replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement|HTMLElement[];
 }
