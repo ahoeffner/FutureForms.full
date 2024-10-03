@@ -72,15 +72,18 @@ export class Parser
             for (let i = 0; i < attrs.length; i++)
             {
                let attr:string = attrs[i];
-               console.log("check "+attr)
                tag = this.customattrs.get(attr.toLowerCase());
 
                if (tag != null)
                {
-                  replace = tag.replace(form,element);
+                  replace = tag.replace(form,element,attr);
                   this.replace(element,replace);
+                  break;
                }
             }
+
+            if (!tag)
+               this.parse(form,nodes[i] as HTMLElement);
          }
       }
    }
@@ -98,11 +101,14 @@ export class Parser
       }
 
       let next:HTMLElement = element;
+      let prev:HTMLElement = element;
 
       for (let i = 0; i < replace.length; i++)
       {
          next.after(replace[i]);
          next = replace[i];
       }
+
+      prev.remove();
    }
 }
