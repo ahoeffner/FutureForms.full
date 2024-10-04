@@ -44,16 +44,8 @@ export class Parser
 
    public async parse(component?:any, element?:HTMLElement) : Promise<void>
    {
-      console.log("parse "+element.tagName)
-      if (!element) element = document.body;
-      this.translate(component,element,[]);
-   }
-
-
-   private async translate(component:any, element:HTMLElement) : Promise<void>
-   {
       if (element == null)
-			return;
+			element = document.body;
 
 		if (!element.childNodes)
 			return;
@@ -67,10 +59,10 @@ export class Parser
       {
          if (nodes[i] instanceof HTMLElement)
          {
-            console.log("translate2 "+(nodes[i] as HTMLElement).tagName)
+            console.log("translate "+(nodes[i] as HTMLElement).tagName)
 
             if (!this.resolve(component,nodes[i]))
-               this.translate(component,nodes[i] as HTMLElement);
+               this.parse(component,nodes[i] as HTMLElement);
          }
       }
    }
@@ -79,8 +71,6 @@ export class Parser
    private resolve(component:any, element:Node) : boolean
    {
       let tag:Tag = null;
-      let resolved:Tag[] = [];
-      let done:boolean = false;
       let replace:HTMLElement|HTMLElement[] = null;
 
       if (!(element instanceof HTMLElement))
@@ -91,7 +81,7 @@ export class Parser
       if (tag)
       {
          replace = tag.replace(component,element);
-         this.replace(component,element,replace,resolved);
+         this.replace(component,element,replace);
       }
 
 
@@ -102,14 +92,10 @@ export class Parser
          let attr:string = attrs[i];
          tag = this.customattrs.get(attr.toLowerCase());
 
-         if (resolved.indexOf(tag) >= 0)
-            tag = null;
-
          if (tag != null)
          {
-            resolved.push(tag);
             replace = tag.replace(component,element,attr);
-            this.replace(component,element,replace,resolved);
+            this.replace(component,element,replace);
          }
       }
 
@@ -117,7 +103,7 @@ export class Parser
    }
 
 
-   private replace(component:any, element:HTMLElement, replace:HTMLElement|HTMLElement[], resolved:Tag[]) : void
+   private replace(component:any, element:HTMLElement, replace:HTMLElement|HTMLElement[]) : void
    {
       if (!replace)
          return;
@@ -125,7 +111,7 @@ export class Parser
       if (!Array.isArray(replace))
       {
          element.replaceWith(replace);
-         this.translate(component,replace,resolved);
+         this.parse(component,replace);
          return;
       }
 
@@ -135,7 +121,7 @@ export class Parser
       for (let i = 0; i < replace.length; i++)
       {
          next.after(replace[i]);
-         this.translate(component,replace[i],resolved);
+         this.parse(component,replace[i]);
          next = replace[i];
       }
 
