@@ -20,12 +20,14 @@
 */
 
 import { Tag } from './tags/Tag.js';
-import { Form } from '../public/Form.js';
 import { Foreach } from './tags/Foreach.js';
 
 
 export class Parser
 {
+   private static limit:number = 0;
+
+
    public get customtags() : Map<string,Tag>
    {
       return(new Map());
@@ -40,56 +42,82 @@ export class Parser
    }
 
 
-   public async parse(form:Form, page:HTMLElement) : Promise<void>
+   public async parse(component?:any, element?:HTMLElement) : Promise<void>
    {
-      if (page == null)
+      console.log("parse "+element.tagName)
+      if (!element) element = document.body;
+      this.translate(component,element,[]);
+   }
+
+
+   private async translate(component:any, element:HTMLElement) : Promise<void>
+   {
+      if (element == null)
 			return;
 
-		if (!page.childNodes)
+		if (!element.childNodes)
 			return;
+
+      if (++Parser.limit > 10) return;
 
       let nodes:Node[] = [];
-		page.childNodes.forEach((node) => {nodes.push(node)});
+		element.childNodes.forEach((node) => {nodes.push(node)});
 
       for (let i = 0; i < nodes.length; i++)
       {
          if (nodes[i] instanceof HTMLElement)
          {
-            let tag:Tag = null;
-            let replace:HTMLElement|HTMLElement[] = null;
-            let element:HTMLElement = nodes[i] as HTMLElement;
+            console.log("translate2 "+(nodes[i] as HTMLElement).tagName)
 
-            tag = this.customtags.get(element.tagName.toLowerCase());
-
-            if (tag != null)
-            {
-               replace = tag.replace(form,element);
-               this.replace(element,replace);
-            }
-
-            let attrs:string[] = element.getAttributeNames();
-
-            for (let i = 0; i < attrs.length; i++)
-            {
-               let attr:string = attrs[i];
-               tag = this.customattrs.get(attr.toLowerCase());
-
-               if (tag != null)
-               {
-                  replace = tag.replace(form,element,attr);
-                  this.replace(element,replace);
-                  break;
-               }
-            }
-
-            if (!tag)
-               this.parse(form,nodes[i] as HTMLElement);
+            if (!this.resolve(component,nodes[i]))
+               this.translate(component,nodes[i] as HTMLElement);
          }
       }
    }
 
 
-   private replace(element:HTMLElement, replace:HTMLElement|HTMLElement[]) : void
+   private resolve(component:any, element:Node) : boolean
+   {
+      let tag:Tag = null;
+      let resolved:Tag[] = [];
+      let done:boolean = false;
+      let replace:HTMLElement|HTMLElement[] = null;
+
+      if (!(element instanceof HTMLElement))
+         return(false);
+
+      tag = this.customtags.get(element.tagName.toLowerCase());
+
+      if (tag)
+      {
+         replace = tag.replace(component,element);
+         this.replace(component,element,replace,resolved);
+      }
+
+
+      let attrs:string[] = element.getAttributeNames();
+
+      for (let i = 0; i < attrs.length; i++)
+      {
+         let attr:string = attrs[i];
+         tag = this.customattrs.get(attr.toLowerCase());
+
+         if (resolved.indexOf(tag) >= 0)
+            tag = null;
+
+         if (tag != null)
+         {
+            resolved.push(tag);
+            replace = tag.replace(component,element,attr);
+            this.replace(component,element,replace,resolved);
+         }
+      }
+
+      return(false);
+   }
+
+
+   private replace(component:any, element:HTMLElement, replace:HTMLElement|HTMLElement[], resolved:Tag[]) : void
    {
       if (!replace)
          return;
@@ -97,6 +125,7 @@ export class Parser
       if (!Array.isArray(replace))
       {
          element.replaceWith(replace);
+         this.translate(component,replace,resolved);
          return;
       }
 
@@ -106,6 +135,7 @@ export class Parser
       for (let i = 0; i < replace.length; i++)
       {
          next.after(replace[i]);
+         this.translate(component,replace[i],resolved);
          next = replace[i];
       }
 
