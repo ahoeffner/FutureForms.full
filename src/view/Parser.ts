@@ -25,9 +25,6 @@ import { Foreach } from './tags/Foreach.js';
 
 export class Parser
 {
-   private static limit:number = 0;
-
-
    public get customtags() : Map<string,Tag>
    {
       return(new Map());
@@ -50,8 +47,6 @@ export class Parser
 		if (!element.childNodes)
 			return;
 
-      if (++Parser.limit > 10) return;
-
       let nodes:Node[] = [];
 		element.childNodes.forEach((node) => {nodes.push(node)});
 
@@ -59,7 +54,8 @@ export class Parser
       {
          if (nodes[i] instanceof HTMLElement)
          {
-            console.log("translate "+(nodes[i] as HTMLElement).tagName)
+            let elem:HTMLElement = nodes[i] as HTMLElement;
+            console.log("parse "+elem.tagName+" "+elem.getAttribute("name"))
 
             if (!this.resolve(component,nodes[i]))
                this.parse(component,nodes[i] as HTMLElement);

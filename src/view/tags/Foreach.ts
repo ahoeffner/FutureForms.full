@@ -30,7 +30,6 @@ export class Foreach extends Tag
 		let expr:string = element.getAttribute(attr);
 
       expr = expr.trim();
-		element.removeAttribute(attr);
 		let pos:number = expr.indexOf(" ");
 
 		if (pos <= 0)
