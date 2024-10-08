@@ -21,5 +21,15 @@
 
 export abstract class Tag
 {
-   public abstract replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement|HTMLElement[];
+	public abstract tagtype:TagType;
+	public abstract identifier:string;
+	public abstract replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement|HTMLElement[];
+}
+
+
+export enum TagType
+{
+	Tag,
+	Attribute,
+	TagAndAttribute
 }

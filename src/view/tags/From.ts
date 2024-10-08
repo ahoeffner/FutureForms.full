@@ -19,11 +19,14 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Tag } from "./Tag.js";
+import { Tag, TagType } from "./Tag.js";
 
 
 export class From extends Tag
 {
+	public identifier:string = "from";
+	public tagtype:TagType = TagType.Attribute;
+
    public replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement
    {
       console.log("from found at "+element.tagName)

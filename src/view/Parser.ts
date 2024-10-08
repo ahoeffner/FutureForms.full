@@ -29,17 +29,27 @@ export class Parser
 {
    public get customtags() : Map<string,Tag>
    {
+      let tag:Tag = null;
       let map:Map<string,Tag> = new Map<string,Tag>();
-      map.set("custom-input",new CustomInput());
+
+      tag = new CustomInput();
+      map.set(tag.identifier,tag);
+
       return(map);
    }
 
 
    public get customattrs() : Map<string,Tag>
    {
+      let tag:Tag = null;
       let map:Map<string,Tag> = new Map<string,Tag>();
-      map.set("from",new From());
-      map.set("foreach",new Foreach());
+
+      tag = new From();
+      map.set(tag.identifier,tag);
+
+      tag = new Foreach();
+      map.set(tag.identifier,tag);
+
       return(map);
    }
 
@@ -80,8 +90,6 @@ export class Parser
       {
          if (nodes[i] instanceof HTMLElement)
          {
-            let elem:HTMLElement = nodes[i] as HTMLElement;
-
             if (!this.parseElement(component,nodes[i]))
                this.parseContent(component,nodes[i] as HTMLElement);
          }
@@ -96,7 +104,7 @@ export class Parser
     * @param skip Custom tags/attributes that should be skipped (when recursive)
     * @returns Whether the tag was modified
     */
-   public parseElement(component:any, element:Node, skip?:Tag[]) : boolean
+   public parseElement(component:any, element:Node, skip?:string[]) : boolean
    {
       let tag:Tag = null;
       let replace:HTMLElement|HTMLElement[] = null;
@@ -105,7 +113,7 @@ export class Parser
          return(false);
 
       tag = this.customtags.get(element.tagName.toLowerCase());
-      if (skip && skip.indexOf(tag) >= 0) tag = null;
+      if (tag && skip && skip.indexOf(tag.identifier) >= 0) tag = null;
 
       if (tag)
       {
@@ -121,7 +129,7 @@ export class Parser
       {
          let attr:string = attrs[i];
          tag = this.customattrs.get(attr.toLowerCase());
-         if (skip && skip.indexOf(tag) >= 0) tag = null;
+         if (tag && skip && skip.indexOf(tag.identifier) >= 0) tag = null;
 
          if (tag != null)
          {
