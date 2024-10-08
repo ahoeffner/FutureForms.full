@@ -20,26 +20,52 @@
 */
 
 import { Tag } from './tags/Tag.js';
+import { From } from './tags/From.js';
 import { Foreach } from './tags/Foreach.js';
+import { CustomInput } from './tags/CustomInput.js';
 
 
 export class Parser
 {
    public get customtags() : Map<string,Tag>
    {
-      return(new Map());
+      let map:Map<string,Tag> = new Map<string,Tag>();
+      map.set("custom-input",new CustomInput());
+      return(map);
    }
 
 
    public get customattrs() : Map<string,Tag>
    {
       let map:Map<string,Tag> = new Map<string,Tag>();
+      map.set("from",new From());
       map.set("foreach",new Foreach());
       return(map);
    }
 
 
-   public async parse(component?:any, element?:HTMLElement) : Promise<void>
+   /**
+    *
+    * @param fr An element
+    * @param to Another element
+    * @returns The other element, but with all the original attributes
+    */
+	public copyAllAttributes(fr:Element,to:Element) : void
+	{
+		if (fr == null || to == null) return;
+		let attrnames:string[] = fr.getAttributeNames();
+
+		for (let an = 0; an < attrnames.length; an++)
+			to.setAttribute(attrnames[an],fr.getAttribute(attrnames[an]));
+	}
+
+
+   /**
+    * Parse and replace custom tags for the element
+    * @param component The component that 'ownes' this piece of html
+    * @param element The html element
+    */
+   public async parseContent(component?:any, element?:HTMLElement) : Promise<void>
    {
       if (element == null)
 			element = document.body;
@@ -57,14 +83,14 @@ export class Parser
             let elem:HTMLElement = nodes[i] as HTMLElement;
             console.log("parse "+elem.tagName+" "+elem.getAttribute("name"))
 
-            if (!this.resolve(component,nodes[i]))
-               this.parse(component,nodes[i] as HTMLElement);
+            if (!this.parseElement(component,nodes[i]))
+               this.parseContent(component,nodes[i] as HTMLElement);
          }
       }
    }
 
 
-   private resolve(component:any, element:Node) : boolean
+   public parseElement(component:any, element:Node, skip?:Tag[]) : boolean
    {
       let tag:Tag = null;
       let replace:HTMLElement|HTMLElement[] = null;
@@ -73,11 +99,14 @@ export class Parser
          return(false);
 
       tag = this.customtags.get(element.tagName.toLowerCase());
+      if (skip && skip.indexOf(tag) >= 0) tag = null;
 
       if (tag)
       {
+         console.log("resolve "+tag.constructor.name)
          replace = tag.replace(component,element);
          this.replace(component,element,replace);
+         return(true);
       }
 
 
@@ -87,11 +116,14 @@ export class Parser
       {
          let attr:string = attrs[i];
          tag = this.customattrs.get(attr.toLowerCase());
+         if (skip && skip.indexOf(tag) >= 0) tag = null;
 
          if (tag != null)
          {
+            console.log("resolve "+tag.constructor.name)
             replace = tag.replace(component,element,attr);
             this.replace(component,element,replace);
+            return(true);
          }
       }
 
@@ -107,7 +139,7 @@ export class Parser
       if (!Array.isArray(replace))
       {
          element.replaceWith(replace);
-         this.parse(component,replace);
+         this.parseContent(component,replace);
          return;
       }
 
@@ -117,7 +149,7 @@ export class Parser
       for (let i = 0; i < replace.length; i++)
       {
          next.after(replace[i]);
-         this.parse(component,replace[i]);
+         this.parseContent(component,replace[i]);
          next = replace[i];
       }
 

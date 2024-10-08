@@ -19,37 +19,14 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { Tag } from "./Tag.js";
 
-import { Parser } from './view/Parser.js';
-import { EventHandler } from './events/EventHandler.js';
-import { FormsModule as FormsModuleCore} from 'futureforms';
 
-export class FormsModule extends FormsModuleCore
+export class From extends Tag
 {
-	public static version() : string
+   public replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement
    {
-      return(FormsModuleCore.version());
+      console.log("from found at "+element.tagName)
+      return(element);
    }
-
-
-	public static language() : string
-	{
-		return(FormsModuleCore.Language);
-	}
-
-
-	public static async initialize() : Promise<void>
-	{
-		EventHandler.initialize();
-
-		new Parser().parseContent(null,document.body);
-
-		let elem:HTMLElement = document.querySelector("[name='country_id']");
-
-		elem.addEventListener("focusin", (event) =>
-		{
-			console.log("elem focus");
-			event.stopPropagation();
-		})
-	}
 }

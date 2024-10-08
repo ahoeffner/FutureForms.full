@@ -40,6 +40,6 @@ export class Form
       }
 
       let parser:Parser = new Parser();
-      parser.parse(this.parent,view);
+      parser.parseContent(this.parent,view);
    }
 }
