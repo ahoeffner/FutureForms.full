@@ -81,7 +81,6 @@ export class Parser
          if (nodes[i] instanceof HTMLElement)
          {
             let elem:HTMLElement = nodes[i] as HTMLElement;
-            console.log("parse "+elem.tagName+" "+elem.getAttribute("name"))
 
             if (!this.parseElement(component,nodes[i]))
                this.parseContent(component,nodes[i] as HTMLElement);
@@ -90,6 +89,13 @@ export class Parser
    }
 
 
+   /**
+    * Parse and possible replace the given element
+    * @param component The component that 'ownes' this piece of html
+    * @param element The html element
+    * @param skip Custom tags/attributes that should be skipped (when recursive)
+    * @returns Whether the tag was modified
+    */
    public parseElement(component:any, element:Node, skip?:Tag[]) : boolean
    {
       let tag:Tag = null;
@@ -103,7 +109,6 @@ export class Parser
 
       if (tag)
       {
-         console.log("resolve "+tag.constructor.name)
          replace = tag.replace(component,element);
          this.replace(component,element,replace);
          return(true);
@@ -120,7 +125,6 @@ export class Parser
 
          if (tag != null)
          {
-            console.log("resolve "+tag.constructor.name)
             replace = tag.replace(component,element,attr);
             this.replace(component,element,replace);
             return(true);
