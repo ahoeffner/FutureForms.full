@@ -20,40 +20,11 @@
 */
 
 import { Tag } from './tags/Tag.js';
-import { From } from './tags/From.js';
-import { Foreach } from './tags/Foreach.js';
-import { CustomInput } from './tags/CustomInput.js';
+import { TagLibrary } from './tags/TagLibrary.js';
 
 
 export class Parser
 {
-   public get customtags() : Map<string,Tag>
-   {
-      let tag:Tag = null;
-      let map:Map<string,Tag> = new Map<string,Tag>();
-
-      tag = new CustomInput();
-      map.set(tag.identifier,tag);
-
-      return(map);
-   }
-
-
-   public get customattrs() : Map<string,Tag>
-   {
-      let tag:Tag = null;
-      let map:Map<string,Tag> = new Map<string,Tag>();
-
-      tag = new From();
-      map.set(tag.identifier,tag);
-
-      tag = new Foreach();
-      map.set(tag.identifier,tag);
-
-      return(map);
-   }
-
-
    /**
     *
     * @param fr An element
@@ -112,8 +83,14 @@ export class Parser
       if (!(element instanceof HTMLElement))
          return(false);
 
-      tag = this.customtags.get(element.tagName.toLowerCase());
-      if (tag && skip && skip.indexOf(tag.identifier) >= 0) tag = null;
+      if (skip)
+      {
+         for (let i = 0; i < skip.length; i++)
+            skip[i] = skip[i]?.toLowerCase();
+      }
+
+      tag = TagLibrary.getCustomTag(element.tagName);
+      if (tag && skip && skip.indexOf(tag.identifier?.toLowerCase()) >= 0) tag = null;
 
       if (tag)
       {
@@ -128,8 +105,8 @@ export class Parser
       for (let i = 0; i < attrs.length; i++)
       {
          let attr:string = attrs[i];
-         tag = this.customattrs.get(attr.toLowerCase());
-         if (tag && skip && skip.indexOf(tag.identifier) >= 0) tag = null;
+         tag = TagLibrary.getCustomAttribute(attr);
+         if (tag && skip && skip.indexOf(tag.identifier?.toLowerCase()) >= 0) tag = null;
 
          if (tag != null)
          {

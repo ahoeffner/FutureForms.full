@@ -16,4 +16,4 @@ export { Filter, Filters, NameValuePair } from 'futureforms';
 
 export { Form } from './src/public/Form.js';
 export { Source } from './src/model/Source.js';
-export { FormsModule } from './src/FormsModule.js';
+export { FormsModule } from './src/public/FormsModule.js';

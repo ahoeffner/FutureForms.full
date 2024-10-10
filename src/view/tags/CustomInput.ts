@@ -19,14 +19,13 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { Tag } from "./Tag.js";
 import { Parser } from "../Parser.js";
-import { Tag, TagType } from "./Tag.js";
 
 
 export class CustomInput extends Tag
 {
 	public identifier:string = "custom-input";
-	public tagtype:TagType = TagType.Tag;
 
 
    // Shows recursive parsing

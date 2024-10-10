@@ -19,13 +19,12 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Tag, TagType } from "./Tag.js";
+import { Tag } from "./Tag.js";
 
 
 export class Foreach extends Tag
 {
 	public identifier:string = "foreach";
-	public tagtype:TagType = TagType.Attribute;
 
    public replace(_clazz:any, element:HTMLElement, attr?:string) : HTMLElement[]
    {

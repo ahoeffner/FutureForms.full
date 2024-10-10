@@ -19,37 +19,51 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+const version = "3.0.0";
 
-import { Parser } from './view/Parser.js';
-import { EventHandler } from './events/EventHandler.js';
+
+import { Parser } from '../view/Parser.js';
+import { EventHandler } from '../events/EventHandler.js';
 import { FormsModule as FormsModuleCore} from 'futureforms';
+import { TagLibrary } from '../view/tags/TagLibrary.js';
+import { CustomInput } from '../view/tags/CustomInput.js';
 
 export class FormsModule extends FormsModuleCore
 {
-	public static version() : string
+   /**
+    * @returns The version of this library
+    */
+   public static version() : string
+   {
+      return(version);
+   }
+
+   /**
+    * @returns The version of the core library
+    */
+	public static coreVersion() : string
    {
       return(FormsModuleCore.version());
    }
 
 
+   /**
+    * @returns The browser language
+    */
 	public static language() : string
 	{
 		return(FormsModuleCore.Language);
 	}
 
 
+   /**
+    * Initialize the application
+    */
 	public static async initialize() : Promise<void>
 	{
 		EventHandler.initialize();
+		new Parser().parseContent();
 
-		new Parser().parseContent(null,document.body);
-
-		let elem:HTMLElement = document.querySelector("[name='country_id']");
-
-		elem.addEventListener("focusin", (event) =>
-		{
-			console.log("elem focus");
-			event.stopPropagation();
-		})
+      TagLibrary.addCustomAttribute(CustomInput);
 	}
 }

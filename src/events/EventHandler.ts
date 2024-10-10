@@ -23,14 +23,14 @@ export class EventHandler implements EventListenerObject
 {
    private defer$:boolean = false;
 
-   public static deferable$:string[] =
+   private static deferable$:string[] =
    [
       "click",
       "focus", // Actually not listening for focus, but 'focusin' will be triggered
       "focusin"
    ]
 
-   public static fkeys$:string[] =
+   private static fkeys$:string[] =
    [
       'Tab',
       'Escape',
@@ -53,6 +53,9 @@ export class EventHandler implements EventListenerObject
    ];
 
 
+   /**
+    * Add the necessary events
+    */
    public static initialize() : void
    {
       let handler:EventHandler = new EventHandler();
@@ -67,6 +70,10 @@ export class EventHandler implements EventListenerObject
    private constructor() {};
 
 
+   /**
+    * @param event The event to be handles
+    * @returns
+    */
    public handleEvent(event:Event) : void
    {
       if (this.defer$ && EventHandler.deferable$.includes(event.type))
@@ -77,6 +84,9 @@ export class EventHandler implements EventListenerObject
    }
 
 
+   /**
+    * @param event The event to be deferred
+    */
    public deferEvent(event:Event) : void
    {
       if (EventHandler.deferable$.includes(event.type))

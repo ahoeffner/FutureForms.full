@@ -19,8 +19,34 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-export abstract class Tag
+/**
+ * Definition of the type 'Class'.
+ * JavaScript doesn't have a suitable
+ * definition of a Class, especially since
+ * it is not really Object Oriented.
+ *
+ * @typeparam T - The type of the class instance.
+ */
+export type Class<T> =
 {
-	public abstract identifier:string;
-	public abstract replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement|HTMLElement[];
+    /**
+    * Constructor signature for the class.
+    *
+    * @param args - The arguments for the constructor.
+    */
+    new(...args: any[]) : T;
+};
+
+/**
+ * Checks if the provided value is a class.
+ *
+ * @param clazz - The value to check.
+ * @returns A boolean indicating whether the value is a class.
+ */
+export function isClass(clazz:any) : clazz is Class<any>
+{
+  /**
+  * Check if the provided value starts with "class".
+  */
+	return((clazz+"").startsWith("class"));
 }
