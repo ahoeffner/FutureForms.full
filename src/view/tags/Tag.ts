@@ -22,5 +22,5 @@
 export abstract class Tag
 {
 	public abstract identifier:string;
-	public abstract replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement|HTMLElement[];
+	public abstract replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement|HTMLElement[]|Promise<HTMLElement|HTMLElement[]>;
 }

@@ -46,7 +46,7 @@ export class Parser
     * @param component The component that 'ownes' this piece of html
     * @param element The html element
     */
-   public async parseContent(component?:any, element?:HTMLElement) : Promise<void>
+   public async parseContent(element?:HTMLElement, component?:any) : Promise<void>
    {
       if (element == null)
 			element = document.body;
@@ -61,8 +61,8 @@ export class Parser
       {
          if (nodes[i] instanceof HTMLElement)
          {
-            if (!this.parseElement(component,nodes[i]))
-               this.parseContent(component,nodes[i] as HTMLElement);
+            if (!await this.parseElement(component,nodes[i]))
+               await this.parseContent(nodes[i] as HTMLElement, component);
          }
       }
    }
@@ -75,7 +75,7 @@ export class Parser
     * @param skip Custom tags/attributes that should be skipped (when recursive)
     * @returns Whether the tag was modified
     */
-   public parseElement(component:any, element:Node, skip?:string[]) : boolean
+   public async parseElement(component:any, element:Node, skip?:string[]) : Promise<boolean>
    {
       let tag:Tag = null;
       let replace:HTMLElement|HTMLElement[] = null;
@@ -94,8 +94,8 @@ export class Parser
 
       if (tag)
       {
-         replace = tag.replace(component,element);
-         this.replace(component,element,replace);
+         replace = await this.getTagReplacement(tag,component,element);
+         await this.replace(component,element,replace);
          return(true);
       }
 
@@ -110,8 +110,8 @@ export class Parser
 
          if (tag != null)
          {
-            replace = tag.replace(component,element,attr);
-            this.replace(component,element,replace);
+            replace = await this.getTagReplacement(tag,component,element);
+            await this.replace(component,element,replace);
             return(true);
          }
       }
@@ -120,7 +120,7 @@ export class Parser
    }
 
 
-   private replace(component:any, element:HTMLElement, replace:HTMLElement|HTMLElement[]) : void
+   private async replace(component:any, element:HTMLElement, replace:HTMLElement|HTMLElement[]) : Promise<void>
    {
       if (!replace)
          return;
@@ -128,7 +128,7 @@ export class Parser
       if (!Array.isArray(replace))
       {
          element.replaceWith(replace);
-         this.parseContent(component,replace);
+         await this.parseContent(replace,component);
          return;
       }
 
@@ -138,10 +138,18 @@ export class Parser
       for (let i = 0; i < replace.length; i++)
       {
          next.after(replace[i]);
-         this.parseContent(component,replace[i]);
+         await this.parseContent(replace[i],component);
          next = replace[i];
       }
 
       prev.remove();
+   }
+
+
+   private async getTagReplacement(tag:Tag, component:any, element:Node) : Promise<HTMLElement|HTMLElement[]>
+   {
+      let resp:any = tag.replace(component,element as HTMLElement);
+      if (resp instanceof Promise) await resp;
+      return(resp)
    }
 }
