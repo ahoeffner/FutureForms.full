@@ -23,10 +23,9 @@ const version = "3.0.0";
 
 
 import { Parser } from '../view/Parser.js';
+import { TagLibrary } from '../view/tags/TagLibrary.js';
 import { EventHandler } from '../events/EventHandler.js';
 import { FormsModule as FormsModuleCore} from 'futureforms';
-import { TagLibrary } from '../view/tags/TagLibrary.js';
-import { CustomInput } from '../view/tags/CustomInput.js';
 
 export class FormsModule extends FormsModuleCore
 {
@@ -63,7 +62,5 @@ export class FormsModule extends FormsModuleCore
 	{
 		EventHandler.initialize();
 		new Parser().parseContent();
-
-      TagLibrary.addCustomAttribute(CustomInput);
 	}
 }

@@ -22,9 +22,8 @@
 import { Tag } from "./Tag.js";
 import { From } from "./From.js";
 import { Foreach } from "./Foreach.js";
-import { Class } from '../../public/Class.js';
-import { CustomInput } from "./CustomInput.js";
 import { Component } from "./Component.js";
+import { Class } from '../../public/Class.js';
 
 
 export class TagLibrary
@@ -38,12 +37,8 @@ export class TagLibrary
     */
    private static inittags() : Map<string,Tag>
    {
-      let tag:Tag = null;
+      //let tag:Tag = null;
       let tags:Map<string,Tag> = new Map<string,Tag>();
-
-      tag = new CustomInput();
-      tags.set(tag.identifier?.toLowerCase(),tag);
-
       return(tags);
    }
 
