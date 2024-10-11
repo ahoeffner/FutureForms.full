@@ -19,15 +19,20 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Tag } from "./Tag.js";
-
-
-export class From extends Tag
+export class Classes
 {
-	public identifier:string = "from";
+   private static classes$:Map<string,any> =
+      new Map<string,any>();
 
-   public replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement
+
+   public static get(name:string) : any
    {
-      return(element);
+      return(this.classes$.get(name.toLowerCase()));
+   }
+
+
+   public static add(name:string, clazz:any) : void
+   {
+      this.classes$.set(name.toLowerCase(),clazz);
    }
 }

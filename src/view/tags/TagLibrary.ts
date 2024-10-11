@@ -24,6 +24,7 @@ import { From } from "./From.js";
 import { Foreach } from "./Foreach.js";
 import { Class } from '../../public/Class.js';
 import { CustomInput } from "./CustomInput.js";
+import { Component } from "./Component.js";
 
 
 export class TagLibrary
@@ -59,6 +60,9 @@ export class TagLibrary
       tags.set(tag.identifier?.toLowerCase(),tag);
 
       tag = new Foreach();
+      tags.set(tag.identifier?.toLowerCase(),tag);
+
+      tag = new Component();
       tags.set(tag.identifier?.toLowerCase(),tag);
 
       return(tags);

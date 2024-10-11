@@ -19,6 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { ComponentTag } from './tags/ComponentTag.js';
 import { Tag } from './tags/Tag.js';
 import { TagLibrary } from './tags/TagLibrary.js';
 
@@ -91,6 +92,7 @@ export class Parser
 
       if (tag)
       {
+         if (tag instanceof ComponentTag) return(this.consume(tag,element,null));
          replace = await this.getTagReplacement(tag,component,element,null,skip);
          await this.replace(component,element,replace);
          return(true);
@@ -106,6 +108,7 @@ export class Parser
 
          if (tag != null)
          {
+            if (tag instanceof ComponentTag) return(this.consume(tag,element,attr));
             replace = await this.getTagReplacement(tag,component,element,attr,skip);
             await this.replace(component,element,replace);
             return(true);
@@ -149,6 +152,7 @@ export class Parser
 
       if (resp)
       {
+         // Recursive replacements
          skip.push(tag.identifier?.toLowerCase());
 
          if (!Array.isArray(resp))
@@ -158,12 +162,18 @@ export class Parser
          else
          {
             for (let i = 0; i < resp.length; i++)
-            {
                await this.parseElement(component,resp[i],skip);
-            }
          }
       }
 
       return(resp)
+   }
+
+
+   private async consume(tag:ComponentTag, element:Node, attr:string) : Promise<boolean>
+   {
+      let resp:any = tag.consume(element as HTMLElement,attr);
+      if (resp instanceof Promise) await resp;
+      return(true);
    }
 }

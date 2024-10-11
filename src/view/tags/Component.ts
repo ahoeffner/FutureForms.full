@@ -19,15 +19,24 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Tag } from "./Tag.js";
+import { Classes } from "../../public/Classes.js";
+import { Parser } from "../Parser.js";
+import { ComponentTag } from "./ComponentTag.js";
 
 
-export class From extends Tag
+export class Component extends ComponentTag
 {
-	public identifier:string = "from";
+  public identifier:string = "component";
 
-   public replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement
-   {
-      return(element);
-   }
+  public async consume(element:HTMLElement, attr:string): Promise<boolean>
+  {
+    let name:string = element.getAttribute(attr);
+    let clazz:any = Classes.get(name);
+    console.log("class? "+clazz);
+
+    let parser:Parser = new Parser();
+    parser.parseContent(element,clazz);
+    
+    return(true);
+  }
 }

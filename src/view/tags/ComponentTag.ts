@@ -21,13 +21,12 @@
 
 import { Tag } from "./Tag.js";
 
-
-export class From extends Tag
+export abstract class ComponentTag extends Tag
 {
-	public identifier:string = "from";
+	public abstract consume(element:HTMLElement, attr?:string) : boolean|Promise<boolean>;
 
-   public replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement
+   public replace(_clazz: any, _element: HTMLElement, _attr?: string) : HTMLElement
    {
-      return(element);
+      throw new Error("Method not implemented.");
    }
 }
