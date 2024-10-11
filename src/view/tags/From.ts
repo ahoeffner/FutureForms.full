@@ -28,6 +28,7 @@ export class From extends Tag
 
    public replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement
    {
+      console.log("from")
       return(element);
    }
 }

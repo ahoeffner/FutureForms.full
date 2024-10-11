@@ -29,14 +29,10 @@ export class CustomInput extends Tag
 
 
    // Shows recursive parsing
-   public replace(clazz:any, element:HTMLElement, _attr?:string) : HTMLElement
+   public replace(_clazz:any, element:HTMLElement, _attr?:string) : HTMLElement
    {
       let input:HTMLInputElement = document.createElement("input");
-
-      let parser:Parser = new Parser();
-      parser.copyAllAttributes(element,input);
-      parser.parseElement(clazz,input);
-
+      Parser.copyAllAttributes(element,input);
       return(input);
    }
 }

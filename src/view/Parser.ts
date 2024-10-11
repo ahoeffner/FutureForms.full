@@ -31,7 +31,7 @@ export class Parser
     * @param to Another element
     * @returns The other element, but with all the original attributes
     */
-	public copyAllAttributes(fr:Element,to:Element) : void
+	public static copyAllAttributes(fr:Element,to:Element) : void
 	{
 		if (fr == null || to == null) return;
 		let attrnames:string[] = fr.getAttributeNames();
@@ -75,30 +75,26 @@ export class Parser
     * @param skip Custom tags/attributes that should be skipped (when recursive)
     * @returns Whether the tag was modified
     */
-   public async parseElement(component:any, element:Node, skip?:string[]) : Promise<boolean>
+   private async parseElement(component:any, element:Node, skip?:string[]) : Promise<boolean>
    {
       let tag:Tag = null;
       let replace:HTMLElement|HTMLElement[] = null;
 
+      if (!skip)
+         skip = [];
+
       if (!(element instanceof HTMLElement))
          return(false);
-
-      if (skip)
-      {
-         for (let i = 0; i < skip.length; i++)
-            skip[i] = skip[i]?.toLowerCase();
-      }
 
       tag = TagLibrary.getCustomTag(element.tagName);
       if (tag && skip && skip.indexOf(tag.identifier?.toLowerCase()) >= 0) tag = null;
 
       if (tag)
       {
-         replace = await this.getTagReplacement(tag,component,element);
+         replace = await this.getTagReplacement(tag,component,element,null,skip);
          await this.replace(component,element,replace);
          return(true);
       }
-
 
       let attrs:string[] = element.getAttributeNames();
 
@@ -110,7 +106,7 @@ export class Parser
 
          if (tag != null)
          {
-            replace = await this.getTagReplacement(tag,component,element);
+            replace = await this.getTagReplacement(tag,component,element,attr,skip);
             await this.replace(component,element,replace);
             return(true);
          }
@@ -146,10 +142,28 @@ export class Parser
    }
 
 
-   private async getTagReplacement(tag:Tag, component:any, element:Node) : Promise<HTMLElement|HTMLElement[]>
+   private async getTagReplacement(tag:Tag, component:any, element:Node, attr:string, skip:string[]) : Promise<HTMLElement|HTMLElement[]>
    {
-      let resp:any = tag.replace(component,element as HTMLElement);
+      let resp:any = tag.replace(component,element as HTMLElement,attr);
       if (resp instanceof Promise) await resp;
+
+      if (resp)
+      {
+         skip.push(tag.identifier?.toLowerCase());
+
+         if (!Array.isArray(resp))
+         {
+            await this.parseElement(component,resp,skip);
+         }
+         else
+         {
+            for (let i = 0; i < resp.length; i++)
+            {
+               await this.parseElement(component,resp[i],skip);
+            }
+         }
+      }
+
       return(resp)
    }
 }
