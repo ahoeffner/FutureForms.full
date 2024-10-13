@@ -61,6 +61,5 @@ export class FormsModule extends FormsModuleCore
 	public static async initialize() : Promise<void>
 	{
 		EventHandler.initialize();
-		new Parser().parseContent();
 	}
 }

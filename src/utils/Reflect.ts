@@ -19,30 +19,26 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Parser } from "../Parser.js";
-import { ComponentTag } from "./ComponentTag.js";
-import { Components } from "../../public/Components.js";
-import { Reflection } from "../../utils/Reflect.js";
-
-
-export class Component extends ComponentTag
+export class Reflection
 {
-  public identifier:string = "component";
+	public static getConstructorTypes<T extends (...args: any[]) => any>(constructor: T) : Parameters<T>
+	{
+		let regex:RegExp = /\(([^)]*)\)/;
+		let name:string = constructor.toString();
+		let match:RegExpExecArray = regex.exec(name);
 
-  public async consume(element:HTMLElement, attr:string): Promise<boolean>
-  {
-    let component:any = null;
-    let name:string = element.getAttribute(attr);
-    let clazz:any = Components.get(name);
+		if (match)
+		{
+			console.log(match)
+			let types:string[] = match[1].split(",").map(param =>
+			{
+				console.log(param)
+				return(param);
+			});
 
-    if (clazz)
-    {
-      Reflection.getConstructorTypes(clazz);
-    }
+		  return(types as Parameters<T>);
 
-    let parser:Parser = new Parser();
-    parser.parseContent(element,clazz);
-
-    return(true);
-  }
+		}
+		else throw new Error("Unable to infer constructor types");
+	 }
 }

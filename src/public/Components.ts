@@ -19,19 +19,22 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-export class Classes
+import { Class } from "./Class.js";
+
+
+export class Components
 {
-   private static classes$:Map<string,any> =
+   private static classes$:Map<string,Class<any>> =
       new Map<string,any>();
 
 
-   public static get(name:string) : any
+   public static get(name:string) : Class<any>
    {
       return(this.classes$.get(name.toLowerCase()));
    }
 
 
-   public static add(name:string, clazz:any) : void
+   public static add(name:string, clazz:Class<any>) : void
    {
       this.classes$.set(name.toLowerCase(),clazz);
    }
