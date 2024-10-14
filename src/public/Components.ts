@@ -20,22 +20,32 @@
 */
 
 import { Class } from "./Class.js";
+import { ComponentFactory, DefaultComponentFactory } from "./ComponentFactory.js";
 
 
 export class Components
 {
-   private static classes$:Map<string,Class<any>> =
+   private static classes$:Map<string,ComponentEntry> =
       new Map<string,any>();
 
 
-   public static get(name:string) : Class<any>
+   public static async get(name:string, element:HTMLElement) : Promise<any>
    {
-      return(this.classes$.get(name.toLowerCase()));
+      let entry:ComponentEntry = this.classes$.get(name.toLowerCase());
+      let factory:ComponentFactory = new entry.factory();
+      return(await factory.instantiate(entry.clazz,element));
    }
 
 
-   public static add(name:string, clazz:Class<any>) : void
+   public static add(name:string, clazz:Class<any>, factory?:Class<ComponentFactory>) : void
    {
-      this.classes$.set(name.toLowerCase(),clazz);
+      if (!factory) factory = DefaultComponentFactory;
+      this.classes$.set(name.toLowerCase(),new ComponentEntry(clazz,factory));
    }
+}
+
+
+class ComponentEntry
+{
+   constructor(public clazz:Class<any>, public factory:Class<ComponentFactory>) {}
 }

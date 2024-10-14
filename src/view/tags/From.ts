@@ -26,7 +26,7 @@ export class From extends Tag
 {
 	public identifier:string = "from";
 
-   public replace(clazz:any, element:HTMLElement, attr?:string) : HTMLElement
+   public replace(element:HTMLElement, attr?:string) : HTMLElement
    {
       return(element);
    }

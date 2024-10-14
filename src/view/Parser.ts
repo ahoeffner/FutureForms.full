@@ -19,9 +19,9 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { ComponentTag } from './tags/ComponentTag.js';
 import { Tag } from './tags/Tag.js';
 import { TagLibrary } from './tags/TagLibrary.js';
+import { ComponentTag } from './tags/ComponentTag.js';
 
 
 export class Parser
@@ -44,10 +44,9 @@ export class Parser
 
    /**
     * Parse and replace custom tags for the element
-    * @param component The component that 'ownes' this piece of html
     * @param element The html element
     */
-   public async parseContent(element?:HTMLElement, component?:any) : Promise<void>
+   public async parseContent(element?:HTMLElement) : Promise<void>
    {
       if (element == null)
 			element = document.body;
@@ -62,8 +61,8 @@ export class Parser
       {
          if (nodes[i] instanceof HTMLElement)
          {
-            if (!await this.parseElement(component,nodes[i]))
-               await this.parseContent(nodes[i] as HTMLElement, component);
+            if (!await this.parseElement(nodes[i]))
+               await this.parseContent(nodes[i] as HTMLElement);
          }
       }
    }
@@ -71,12 +70,11 @@ export class Parser
 
    /**
     * Parse and possible replace the given element
-    * @param component The component that 'ownes' this piece of html
     * @param element The html element
     * @param skip Custom tags/attributes that should be skipped (when recursive)
     * @returns Whether the tag was modified
     */
-   private async parseElement(component:any, element:Node, skip?:string[]) : Promise<boolean>
+   private async parseElement(element:Node, skip?:string[]) : Promise<boolean>
    {
       let tag:Tag = null;
       let replace:HTMLElement|HTMLElement[] = null;
@@ -93,8 +91,8 @@ export class Parser
       if (tag)
       {
          if (tag instanceof ComponentTag) return(this.consume(tag,element,null));
-         replace = await this.getTagReplacement(tag,component,element,null,skip);
-         await this.replace(component,element,replace);
+         replace = await this.getTagReplacement(tag,element,null,skip);
+         await this.replace(element,replace);
          return(true);
       }
 
@@ -109,8 +107,8 @@ export class Parser
          if (tag != null)
          {
             if (tag instanceof ComponentTag) return(this.consume(tag,element,attr));
-            replace = await this.getTagReplacement(tag,component,element,attr,skip);
-            await this.replace(component,element,replace);
+            replace = await this.getTagReplacement(tag,element,attr,skip);
+            await this.replace(element,replace);
             return(true);
          }
       }
@@ -119,7 +117,7 @@ export class Parser
    }
 
 
-   private async replace(component:any, element:HTMLElement, replace:HTMLElement|HTMLElement[]) : Promise<void>
+   private async replace(element:HTMLElement, replace:HTMLElement|HTMLElement[]) : Promise<void>
    {
       if (!replace)
          return;
@@ -127,7 +125,7 @@ export class Parser
       if (!Array.isArray(replace))
       {
          element.replaceWith(replace);
-         await this.parseContent(replace,component);
+         await this.parseContent(replace);
          return;
       }
 
@@ -137,7 +135,7 @@ export class Parser
       for (let i = 0; i < replace.length; i++)
       {
          next.after(replace[i]);
-         await this.parseContent(replace[i],component);
+         await this.parseContent(replace[i]);
          next = replace[i];
       }
 
@@ -145,9 +143,9 @@ export class Parser
    }
 
 
-   private async getTagReplacement(tag:Tag, component:any, element:Node, attr:string, skip:string[]) : Promise<HTMLElement|HTMLElement[]>
+   private async getTagReplacement(tag:Tag, element:Node, attr:string, skip:string[]) : Promise<HTMLElement|HTMLElement[]>
    {
-      let resp:any = tag.replace(component,element as HTMLElement,attr);
+      let resp:any = tag.replace(element as HTMLElement,attr);
       if (resp instanceof Promise) await resp;
 
       if (resp)
@@ -157,12 +155,12 @@ export class Parser
 
          if (!Array.isArray(resp))
          {
-            await this.parseElement(component,resp,skip);
+            await this.parseElement(resp,skip);
          }
          else
          {
             for (let i = 0; i < resp.length; i++)
-               await this.parseElement(component,resp[i],skip);
+               await this.parseElement(resp[i],skip);
          }
       }
 

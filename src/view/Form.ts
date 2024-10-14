@@ -24,22 +24,15 @@ import { Form as Parent } from '../public/Form.js';
 
 export class Form
 {
-   constructor(private parent:Parent, view?:HTMLElement|string)
+   constructor(private parent:Parent, view?:HTMLElement)
    {
       if (view) this.setView(view);
    }
 
 
-   public async setView(view:HTMLElement|string) : Promise<void>
+   public async setView(view:HTMLElement) : Promise<void>
    {
-      if (typeof view === "string")
-      {
-         let html:string = view;
-         view = document.createElement("form");
-         view.innerHTML = html;
-      }
-
       let parser:Parser = new Parser();
-      parser.parseContent(view,this.parent);
+      parser.parseContent(view);
    }
 }

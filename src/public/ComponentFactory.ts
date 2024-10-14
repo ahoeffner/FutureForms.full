@@ -19,26 +19,20 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-export class Reflection
+import { Class } from './Class.js';
+
+
+export abstract class ComponentFactory
 {
-	public static getConstructorTypes<T extends (...args: any[]) => any>(constructor: T) : Parameters<T>
-	{
-		let regex:RegExp = /\(([^)]*)\)/;
-		let name:string = constructor.toString();
-		let match:RegExpExecArray = regex.exec(name);
+   abstract instantiate(clazz:Class<any>, view?:HTMLElement|string) : Promise<any>;
+}
 
-		if (match)
-		{
-			console.log(match)
-			let types:string[] = match[1].split(",").map(param =>
-			{
-				console.log(param)
-				return(param);
-			});
 
-		  return(types as Parameters<T>);
-
-		}
-		else throw new Error("Unable to infer constructor types");
-	 }
+export class DefaultComponentFactory extends ComponentFactory
+{
+   async instantiate(clazz:Class<any>, view?:HTMLElement|string) : Promise<any>
+   {
+      let obj:any = new clazz(view);
+      return(obj);
+   }
 }

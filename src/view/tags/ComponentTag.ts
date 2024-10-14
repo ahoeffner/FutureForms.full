@@ -25,7 +25,7 @@ export abstract class ComponentTag extends Tag
 {
 	public abstract consume(element:HTMLElement, attr?:string) : boolean|Promise<boolean>;
 
-   public replace(_clazz: any, _element: HTMLElement, _attr?: string) : HTMLElement
+   public replace(_element: HTMLElement, _attr?: string) : HTMLElement
    {
       throw new Error("Method not implemented.");
    }

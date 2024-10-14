@@ -27,13 +27,13 @@ export class Form
 	private view$:View;
 
 
-   constructor(view?:HTMLElement|string)
+   constructor(view?:HTMLElement)
    {
       this.view$ = new View(this,view);
    }
 
 
-   public async setView(view:HTMLElement|string) : Promise<void>
+   public async setView(view:HTMLElement) : Promise<void>
    {
       this.view$.setView(view);
    }

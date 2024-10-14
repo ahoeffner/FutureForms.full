@@ -26,7 +26,7 @@ export class Foreach extends Tag
 {
 	public identifier:string = "foreach";
 
-   public replace(_clazz:any, element:HTMLElement, attr?:string) : HTMLElement[]
+   public replace(element:HTMLElement, attr?:string) : HTMLElement[]
    {
       let tags:HTMLElement[] = [];
 		let expr:string = element.getAttribute(attr);

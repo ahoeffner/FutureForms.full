@@ -22,7 +22,6 @@
 import { Parser } from "../Parser.js";
 import { ComponentTag } from "./ComponentTag.js";
 import { Components } from "../../public/Components.js";
-import { Reflection } from "../../utils/Reflect.js";
 
 
 export class Component extends ComponentTag
@@ -31,17 +30,11 @@ export class Component extends ComponentTag
 
   public async consume(element:HTMLElement, attr:string): Promise<boolean>
   {
-    let component:any = null;
     let name:string = element.getAttribute(attr);
-    let clazz:any = Components.get(name);
-
-    if (clazz)
-    {
-      Reflection.getConstructorTypes(clazz);
-    }
+    let clazz:any = Components.get(name,element);
 
     let parser:Parser = new Parser();
-    parser.parseContent(element,clazz);
+    parser.parseContent(element);
 
     return(true);
   }
