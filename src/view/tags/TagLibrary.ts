@@ -28,17 +28,17 @@ import { Class } from '../../public/Class.js';
 
 export class TagLibrary
 {
-   private static tags$:Map<string,Tag> = TagLibrary.inittags();
-   private static attrs$:Map<string,Tag> = TagLibrary.initattrs();
+   private static tags$:Map<string,Class<Tag>> = TagLibrary.inittags();
+   private static attrs$:Map<string,Class<Tag>> = TagLibrary.initattrs();
 
 
    /**
     * Initialize the default tags
     */
-   private static inittags() : Map<string,Tag>
+   private static inittags() : Map<string,Class<Tag>>
    {
       //let tag:Tag = null;
-      let tags:Map<string,Tag> = new Map<string,Tag>();
+      let tags:Map<string,Class<Tag>> = new Map<string,Class<Tag>>();
       return(tags);
    }
 
@@ -46,19 +46,19 @@ export class TagLibrary
    /**
     * Initialize the default attributes
     */
-   private static initattrs() : Map<string,Tag>
+   private static initattrs() : Map<string,Class<Tag>>
    {
       let tag:Tag = null;
-      let tags:Map<string,Tag> = new Map<string,Tag>();
+      let tags:Map<string,Class<Tag>> = new Map<string,Class<Tag>>();
 
       tag = new From();
-      tags.set(tag.identifier?.toLowerCase(),tag);
+      tags.set(tag.identifier?.toLowerCase(),From);
 
       tag = new Foreach();
-      tags.set(tag.identifier?.toLowerCase(),tag);
+      tags.set(tag.identifier?.toLowerCase(),Foreach);
 
       tag = new Component();
-      tags.set(tag.identifier?.toLowerCase(),tag);
+      tags.set(tag.identifier?.toLowerCase(),Component);
 
       return(tags);
    }
@@ -69,7 +69,7 @@ export class TagLibrary
     * @param tag The identifier
     * @returns The tag
     */
-   public static getCustomTag(tag:string) : Tag
+   public static getCustomTag(tag:string) : Class<Tag>
    {
       return(TagLibrary.tags$.get(tag?.toLowerCase()));
    }
@@ -81,7 +81,7 @@ export class TagLibrary
    public static addCustomTag(tag:Class<Tag>) : void
    {
       let impl:Tag = new tag();
-      TagLibrary.tags$.set(impl.identifier?.toLowerCase(),impl);
+      TagLibrary.tags$.set(impl.identifier?.toLowerCase(),tag);
    }
 
 
@@ -102,7 +102,7 @@ export class TagLibrary
    {
       let impl:Tag = new tag();
       TagLibrary.tags$.delete(impl.identifier?.toLowerCase());
-      TagLibrary.tags$.set(identifier?.toLowerCase(),impl);
+      TagLibrary.tags$.set(identifier?.toLowerCase(),tag);
    }
 
 
@@ -111,7 +111,7 @@ export class TagLibrary
     * @param tag The identifier
     * @returns The tag
     */
-   public static getCustomAttribute(tag:string) : Tag
+   public static getCustomAttribute(tag:string) : Class<Tag>
    {
       return(TagLibrary.attrs$.get(tag.toLowerCase()));
    }
@@ -123,7 +123,7 @@ export class TagLibrary
    public static addCustomAttribute(tag:Class<Tag>) : void
    {
       let impl:Tag = new tag();
-      TagLibrary.attrs$.set(impl.identifier?.toLowerCase(),impl);
+      TagLibrary.attrs$.set(impl.identifier?.toLowerCase(),tag);
    }
 
 
@@ -144,6 +144,6 @@ export class TagLibrary
    {
       let impl:Tag = new tag();
       TagLibrary.attrs$.delete(impl.identifier?.toLowerCase());
-      TagLibrary.attrs$.set(identifier?.toLowerCase(),impl);
+      TagLibrary.attrs$.set(identifier?.toLowerCase(),tag);
    }
 }

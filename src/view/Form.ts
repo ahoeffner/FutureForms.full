@@ -33,6 +33,6 @@ export class Form
    public async setView(view:HTMLElement) : Promise<void>
    {
       let parser:Parser = new Parser();
-      parser.parseContent(view);
+      parser.parse(view);
    }
 }

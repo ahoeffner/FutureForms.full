@@ -19,15 +19,39 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Tag } from "./Tag.js";
+import { ComponentTag } from "./ComponentTag.js";
 
 
-export class From extends Tag
+export class From extends ComponentTag
 {
 	public identifier:string = "from";
 
-   public replace(element:HTMLElement, attr?:string) : HTMLElement
+   public consume(element:HTMLElement, attr:string) : Binding
    {
-      return(element);
+      return(new Binding(element,element.getAttribute(attr)));
+   }
+}
+
+
+export class Binding
+{
+   private source$:string;
+   private element$:HTMLElement;
+
+   constructor(element:HTMLElement, source:string)
+   {
+      this.source$ = source;
+      this.element$ = element;
+   }
+
+   public get source() : string
+   {
+      return(this.source$);
+   }
+
+
+   public get element() : HTMLElement
+   {
+      return(this.element$);
    }
 }

@@ -23,7 +23,7 @@ import { Tag } from "./Tag.js";
 
 export abstract class ComponentTag extends Tag
 {
-	public abstract consume(element:HTMLElement, attr?:string) : boolean|Promise<boolean>;
+	public abstract consume(element:HTMLElement, attr?:string) : any|Promise<any>;
 
    public replace(_element: HTMLElement, _attr?: string) : HTMLElement
    {

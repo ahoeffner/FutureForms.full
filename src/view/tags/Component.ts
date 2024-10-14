@@ -19,11 +19,14 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Parser } from "../Parser.js";
 import { ComponentTag } from "./ComponentTag.js";
 import { Components } from "../../public/Components.js";
 
 
+/**
+ * This tag will construct a Component
+ * and subsequently consume the element body
+ */
 export class Component extends ComponentTag
 {
   public identifier:string = "component";
@@ -31,7 +34,7 @@ export class Component extends ComponentTag
   public async consume(element:HTMLElement, attr:string): Promise<boolean>
   {
     let name:string = element.getAttribute(attr);
-    let clazz:any = Components.get(name,element);
-    return(true);
+    let comp:any = Components.get(name,element);
+    return(comp);
   }
 }

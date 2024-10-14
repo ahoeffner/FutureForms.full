@@ -20,37 +20,34 @@
 */
 
 import { Tag } from './tags/Tag.js';
+import { Class } from '../public/Class.js';
 import { TagLibrary } from './tags/TagLibrary.js';
 import { ComponentTag } from './tags/ComponentTag.js';
 
 
 export class Parser
 {
-   /**
-    *
-    * @param fr An element
-    * @param to Another element
-    * @returns The other element, but with all the original attributes
-    */
-	public static copyAllAttributes(fr:Element,to:Element) : void
-	{
-		if (fr == null || to == null) return;
-		let attrnames:string[] = fr.getAttributeNames();
-
-		for (let an = 0; an < attrnames.length; an++)
-			to.setAttribute(attrnames[an],fr.getAttribute(attrnames[an]));
-	}
-
+   private tags$:Map<Class<Tag>,Tag[]> = new Map<Class<Tag>,Tag[]>();
+   private comps$:Map<Class<Tag>,any[]> = new Map<Class<Tag>,any[]>();
 
    /**
     * Parse and replace custom tags for the element
     * @param element The html element
     */
-   public async parseContent(element?:HTMLElement) : Promise<void>
+   public async parse(element?:HTMLElement) : Promise<void>
    {
       if (element == null)
 			element = document.body;
 
+      this.parseContent(element);
+   }
+
+   /**
+    * Parse and replace custom tags for the element
+    * @param element The html element
+    */
+   private async parseContent(element?:HTMLElement) : Promise<void>
+   {
 		if (!element.childNodes)
 			return;
 
@@ -77,6 +74,8 @@ export class Parser
    private async parseElement(element:Node, skip?:string[]) : Promise<boolean>
    {
       let tag:Tag = null;
+      let clazz:Class<Tag> = null;
+
       let replace:HTMLElement|HTMLElement[] = null;
 
       if (!skip)
@@ -85,13 +84,13 @@ export class Parser
       if (!(element instanceof HTMLElement))
          return(false);
 
-      tag = TagLibrary.getCustomTag(element.tagName);
+      clazz = TagLibrary.getCustomTag(element.tagName); if (clazz) tag = new clazz();
       if (tag && skip && skip.indexOf(tag.identifier?.toLowerCase()) >= 0) tag = null;
 
       if (tag != null)
       {
-         if (tag instanceof ComponentTag) return(this.consume(tag,element,null));
-         replace = await this.getTagReplacement(tag,element,null,skip);
+         if (tag instanceof ComponentTag) return(this.consume(clazz,tag,element,null));
+         replace = await this.getTagReplacement(clazz,tag,element,null,skip);
          await this.replace(element,replace);
          return(true);
       }
@@ -101,13 +100,14 @@ export class Parser
       for (let i = 0; i < attrs.length; i++)
       {
          let attr:string = attrs[i];
-         tag = TagLibrary.getCustomAttribute(attr);
+
+         clazz = TagLibrary.getCustomAttribute(attr); if (clazz) tag = new clazz();
          if (tag && skip && skip.indexOf(tag.identifier?.toLowerCase()) >= 0) tag = null;
 
          if (tag != null)
          {
-            if (tag instanceof ComponentTag) return(this.consume(tag,element,attr));
-            replace = await this.getTagReplacement(tag,element,attr,skip);
+            if (tag instanceof ComponentTag) return(this.consume(clazz,tag,element,attr));
+            replace = await this.getTagReplacement(clazz,tag,element,attr,skip);
             await this.replace(element,replace);
             return(true);
          }
@@ -143,8 +143,13 @@ export class Parser
    }
 
 
-   private async getTagReplacement(tag:Tag, element:Node, attr:string, skip:string[]) : Promise<HTMLElement|HTMLElement[]>
+   private async getTagReplacement(clazz:Class<Tag>, tag:Tag, element:Node, attr:string, skip:string[]) : Promise<HTMLElement|HTMLElement[]>
    {
+      let tags:Tag[] = this.tags$.get(clazz);
+      if (!tags) { tags = []; this.tags$.set(clazz,tags)}
+
+      tags.push(tag);
+
       let resp:any = tag.replace(element as HTMLElement,attr);
       if (resp instanceof Promise) await resp;
 
@@ -168,10 +173,15 @@ export class Parser
    }
 
 
-   private async consume(tag:ComponentTag, element:Node, attr:string) : Promise<boolean>
+   private async consume(clazz:Class<Tag>, tag:ComponentTag, element:Node, attr:string) : Promise<boolean>
    {
-      let resp:any = tag.consume(element as HTMLElement,attr);
-      if (resp instanceof Promise) await resp;
+      let comp:any = tag.consume(element as HTMLElement,attr);
+      if (comp instanceof Promise) await comp;
+
+      let comps:any[] = this.comps$.get(clazz);
+      if (!comps) { comps = []; this.comps$.set(clazz,comps)}
+      comps.push(comp);
+
       return(true);
    }
 }
