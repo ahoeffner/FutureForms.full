@@ -88,7 +88,7 @@ export class Parser
       tag = TagLibrary.getCustomTag(element.tagName);
       if (tag && skip && skip.indexOf(tag.identifier?.toLowerCase()) >= 0) tag = null;
 
-      if (tag)
+      if (tag != null)
       {
          if (tag instanceof ComponentTag) return(this.consume(tag,element,null));
          replace = await this.getTagReplacement(tag,element,null,skip);
