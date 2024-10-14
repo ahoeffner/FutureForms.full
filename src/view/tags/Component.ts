@@ -32,10 +32,6 @@ export class Component extends ComponentTag
   {
     let name:string = element.getAttribute(attr);
     let clazz:any = Components.get(name,element);
-
-    let parser:Parser = new Parser();
-    parser.parseContent(element);
-
     return(true);
   }
 }
