@@ -39,13 +39,38 @@ export class Parser
       if (element == null)
 			element = document.body;
 
-      this.parseContent(element);
+      await this.parseContent(element);
    }
 
-   /**
-    * Parse and replace custom tags for the element
-    * @param element The html element
-    */
+
+   public getUsedTags() : Class<Tag>[]
+   {
+      let tags:Class<Tag>[] = [];
+      this.tags$.forEach((_tags, clazz) => tags.push(clazz));
+      return(tags);
+   }
+
+
+   public getUsedComponentTags() : Class<Tag>[]
+   {
+      let tags:Class<Tag>[] = [];
+      this.comps$.forEach((_tags, clazz) => tags.push(clazz));
+      return(tags);
+   }
+
+
+   public getTags(clazz:Class<Tag>) : Tag[]
+   {
+      return(this.tags$.get(clazz));
+   }
+
+
+   public getComponents(clazz:Class<Tag>) : any[]
+   {
+      return(this.comps$.get(clazz));
+   }
+
+
    private async parseContent(element?:HTMLElement) : Promise<void>
    {
 		if (!element.childNodes)
