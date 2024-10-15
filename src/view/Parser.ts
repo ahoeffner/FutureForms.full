@@ -27,6 +27,7 @@ import { ComponentTag } from './tags/ComponentTag.js';
 
 export class Parser
 {
+	private events$:ClassEvent[] = [];
    private tags$:Map<Class<Tag>,Tag[]> = new Map<Class<Tag>,Tag[]>();
    private comps$:Map<Class<Tag>,any[]> = new Map<Class<Tag>,any[]>();
 
@@ -41,6 +42,12 @@ export class Parser
 
       await this.parseContent(element);
    }
+
+
+	public getEvents() : ClassEvent[]
+	{
+		return(this.events$);
+	}
 
 
    public getUsedTags() : Class<Tag>[]
@@ -73,6 +80,11 @@ export class Parser
 
    private async parseContent(element?:HTMLElement) : Promise<void>
    {
+		if (!element)
+			return;
+
+		this.parseEvents(element);
+
 		if (!element.childNodes)
 			return;
 
@@ -209,4 +221,31 @@ export class Parser
 
       return(true);
    }
+
+
+	private parseEvents(element:Node) : void
+	{
+		if (!(element instanceof HTMLElement))
+			return;
+
+		if (element.getAttributeNames)
+		{
+			let attrs:string[] = element.getAttributeNames();
+
+			for (let an = 0; an < attrs.length; an++)
+			{
+				let func:string = element.getAttribute(attrs[an]);
+				if (func != null) func = func.trim();
+
+				if (attrs[an].toLowerCase().startsWith("on") && func.startsWith("this."))
+					this.events$.push(new ClassEvent(element,attrs[an],func));
+			}
+		}
+	}
+}
+
+
+export class ClassEvent
+{
+	constructor(public element:HTMLElement, public event:string, public action:string) {}
 }
