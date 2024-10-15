@@ -19,18 +19,42 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Parser } from './Parser.js';
-import { Form as Parent } from '../public/Form.js';
+import { Parser } from "./Parser.js";
+import { Form as Parent } from "../public/Form.js";
+import { Form as ModelForm } from "../model/Form.js";
 
+
+/**
+ * This class handles all view and user interaction related stuff.
+ * It has links to the public interface as well as the model.
+ * The class is not exposed to the end developer
+ */
 export class Form
 {
+	private parent$:Parent = null;
+	private model$:ModelForm = null;
 	private view$:HTMLElement = null;
 
 
-   constructor(private parent:Parent)
+   constructor(parent:Parent)
    {
+		this.parent$ = parent;
    }
 
+	public get parent() : Parent
+	{
+		return(this.parent$);
+	}
+
+	public get model() : ModelForm
+	{
+		return(this.model$);
+	}
+
+	public set model(form:ModelForm)
+	{
+		this.model$ = form;
+	}
 
 	public getView() : HTMLElement
 	{

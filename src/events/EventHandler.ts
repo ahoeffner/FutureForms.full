@@ -19,8 +19,8 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Form } from "../public/Form.js";
-import { Forms } from "../application/Forms.js";
+import { Form } from "../view/Form.js";
+import { Forms } from "../view/Forms.js";
 
 
 export class EventHandler implements EventListenerObject
@@ -88,7 +88,7 @@ export class EventHandler implements EventListenerObject
 		if (event.target instanceof HTMLElement)
 		{
 			let form:Form = Forms.getActiveForm(event.target)
-			console.log("form: "+form?.name+" "+event.type);
+			console.log("form: "+form?.parent.name+" "+event.type);
 		}
    }
 

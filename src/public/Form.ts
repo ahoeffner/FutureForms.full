@@ -20,9 +20,10 @@
 */
 
 
+import { Forms } from "../view/Forms.js";
 import { Form as View} from "../view/Form.js";
 import { Form as Model} from "../model/Form.js";
-import { Forms } from "../application/Forms.js";
+
 
 export class Form
 {
@@ -33,6 +34,11 @@ export class Form
    constructor(view?:HTMLElement)
    {
       this.view$ = new View(this);
+		this.model$ = new Model(this);
+
+		this.model$.view = this.view$;
+		this.view$.model = this.model$;
+
 		if (view) this.setView(view);
    }
 
@@ -46,6 +52,6 @@ export class Form
    public async setView(view:HTMLElement) : Promise<void>
    {
       await this.view$.setView(view);
-		Forms.add(this,this.view$,this.model$);
+		Forms.add(this.view$);
    }
 }

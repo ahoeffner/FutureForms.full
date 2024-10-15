@@ -19,28 +19,25 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Form } from "../public/Form.js";
-import { Form as ViewForm } from "../view/Form.js";
-import { Form as ModelForm } from "../model/Form.js";
-
+import { Form } from "./Form.js";
 
 export class Forms
 {
 	private static forms$:Map<Form,HTMLElement> =
 		new Map<Form,HTMLElement>();
 
-	private static views$:Map<HTMLElement,FormEntry> =
-   	new Map<HTMLElement,FormEntry>();
+	private static views$:Map<HTMLElement,Form> =
+   	new Map<HTMLElement,Form>();
 
 
-	public static add(form:Form, view:ViewForm, model:ModelForm) : void
+	public static add(form:Form) : void
 	{
-		let elem:HTMLElement = view?.getView();
+		let elem:HTMLElement = form?.getView();
 
 		if (elem)
 		{
 			Forms.forms$.set(form,elem);
-			Forms.views$.set(elem,new FormEntry(form,view,model));
+			Forms.views$.set(elem,form);
 		}
 		else
 		{
@@ -60,21 +57,15 @@ export class Forms
 
 	public static getActiveForm(element:HTMLElement) : Form
 	{
-		let entry:FormEntry = null;
+		let form:Form = null;
 
 		while(element != document.body)
 		{
-			entry = this.views$.get(element);
-			if (entry) return(entry.form);
+			form = this.views$.get(element);
 			element = element.parentElement;
+			if (form) break;
 		}
 
-		return(null);
+		return(form);
 	}
-}
-
-
-class FormEntry
-{
-	constructor(public form:Form, public view:ViewForm, public model:ModelForm) {}
 }
