@@ -19,30 +19,12 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Parser } from './Parser.js';
 import { Form as Parent } from '../public/Form.js';
 
 export class Form
 {
-	private view$:HTMLElement = null;
-
-
-   constructor(private parent:Parent)
-   {
-   }
-
-
-	public getView() : HTMLElement
+	constructor(private parent:Parent)
 	{
-		return(this.view$);
+		
 	}
-
-
-   public async setView(view:HTMLElement) : Promise<void>
-   {
-		this.view$ = view;
-
-      let parser:Parser = new Parser();
-      await parser.parse(this.view$);
-   }
 }

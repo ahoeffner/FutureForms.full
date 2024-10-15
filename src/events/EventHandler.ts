@@ -19,6 +19,10 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { Form } from "../public/Form.js";
+import { Forms } from "../application/Forms.js";
+
+
 export class EventHandler implements EventListenerObject
 {
    private defer$:boolean = false;
@@ -26,7 +30,6 @@ export class EventHandler implements EventListenerObject
    private static deferable$:string[] =
    [
       "click",
-      "focus", // Actually not listening for focus, but 'focusin' will be triggered
       "focusin"
    ]
 
@@ -81,6 +84,12 @@ export class EventHandler implements EventListenerObject
          this.defer$ = false;
          return;
       }
+
+		if (event.target instanceof HTMLElement)
+		{
+			let form:Form = Forms.getActiveForm(event.target)
+			console.log("form: "+form?.name+" "+event.type);
+		}
    }
 
 

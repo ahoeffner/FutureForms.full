@@ -19,30 +19,62 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Parser } from './Parser.js';
-import { Form as Parent } from '../public/Form.js';
+import { Form } from "../public/Form.js";
+import { Form as ViewForm } from "../view/Form.js";
+import { Form as ModelForm } from "../model/Form.js";
 
-export class Form
+
+export class Forms
 {
-	private view$:HTMLElement = null;
+	private static forms$:Map<Form,HTMLElement> =
+		new Map<Form,HTMLElement>();
+
+	private static views$:Map<HTMLElement,FormEntry> =
+   	new Map<HTMLElement,FormEntry>();
 
 
-   constructor(private parent:Parent)
-   {
-   }
-
-
-	public getView() : HTMLElement
+	public static add(form:Form, view:ViewForm, model:ModelForm) : void
 	{
-		return(this.view$);
+		let elem:HTMLElement = view?.getView();
+
+		if (elem)
+		{
+			Forms.forms$.set(form,elem);
+			Forms.views$.set(elem,new FormEntry(form,view,model));
+		}
+		else
+		{
+			Forms.remove(form);
+		}
 	}
 
 
-   public async setView(view:HTMLElement) : Promise<void>
-   {
-		this.view$ = view;
+	public static remove(form:Form) : void
+	{
+		let view:HTMLElement = this.forms$.get(form);
 
-      let parser:Parser = new Parser();
-      await parser.parse(this.view$);
-   }
+		Forms.forms$.delete(form);
+		Forms.views$.delete(view);
+	}
+
+
+	public static getActiveForm(element:HTMLElement) : Form
+	{
+		let entry:FormEntry = null;
+
+		while(element != document.body)
+		{
+			entry = this.views$.get(element);
+			if (entry) return(entry.form);
+			element = element.parentElement;
+		}
+
+		return(null);
+	}
+}
+
+
+class FormEntry
+{
+	constructor(public form:Form, public view:ViewForm, public model:ModelForm) {}
 }

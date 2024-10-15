@@ -20,21 +20,32 @@
 */
 
 
-import { Form as View} from '../view/Form.js';
+import { Form as View} from "../view/Form.js";
+import { Form as Model} from "../model/Form.js";
+import { Forms } from "../application/Forms.js";
 
 export class Form
 {
 	private view$:View;
+	private model$:Model;
 
 
    constructor(view?:HTMLElement)
    {
-      this.view$ = new View(this,view);
+      this.view$ = new View(this);
+		if (view) this.setView(view);
    }
+
+
+	public get name() : string
+	{
+		return(this.constructor.name);
+	}
 
 
    public async setView(view:HTMLElement) : Promise<void>
    {
-      this.view$.setView(view);
+      await this.view$.setView(view);
+		Forms.add(this,this.view$,this.model$);
    }
 }
