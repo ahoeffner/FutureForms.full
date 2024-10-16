@@ -22,13 +22,13 @@
 import { Class } from './Class.js';
 
 
-export abstract class ViewComponentFactory
+export abstract class ComponentFactory
 {
    abstract instantiate(clazz:Class<any>, view?:HTMLElement|string) : Promise<any>;
 }
 
 
-export class DefaultViewComponentFactory extends ViewComponentFactory
+export class DefaultViewComponentFactory extends ComponentFactory
 {
    async instantiate(clazz:Class<any>, view?:HTMLElement|string) : Promise<any>
    {

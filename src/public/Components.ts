@@ -20,10 +20,10 @@
 */
 
 import { Class } from "./Class.js";
-import { ViewComponentFactory, DefaultViewComponentFactory } from "./ViewComponentFactory.js";
+import { ComponentFactory, DefaultViewComponentFactory } from "./ComponentFactory.js";
 
 
-export class ViewComponents
+export class Components
 {
    private static classes$:Map<string,ComponentEntry> =
       new Map<string,any>();
@@ -32,12 +32,12 @@ export class ViewComponents
    public static async get(name:string, element:HTMLElement) : Promise<any>
    {
       let entry:ComponentEntry = this.classes$.get(name.toLowerCase());
-      let factory:ViewComponentFactory = new entry.factory();
+      let factory:ComponentFactory = new entry.factory();
       return(await factory.instantiate(entry.clazz,element));
    }
 
 
-   public static add(name:string, clazz:Class<any>, factory?:Class<ViewComponentFactory>) : void
+   public static add(name:string, clazz:Class<any>, factory?:Class<ComponentFactory>) : void
    {
       if (!factory) factory = DefaultViewComponentFactory;
       this.classes$.set(name.toLowerCase(),new ComponentEntry(clazz,factory));
@@ -47,5 +47,5 @@ export class ViewComponents
 
 class ComponentEntry
 {
-   constructor(public clazz:Class<any>, public factory:Class<ViewComponentFactory>) {}
+   constructor(public clazz:Class<any>, public factory:Class<ComponentFactory>) {}
 }

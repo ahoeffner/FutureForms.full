@@ -22,6 +22,7 @@
 import { Parser } from "./Parser.js";
 import { Form as Parent } from "../public/Form.js";
 import { Form as ModelForm } from "../model/Form.js";
+import { ViewComponent } from "../public/ViewComponent.js";
 
 
 /**
@@ -29,7 +30,7 @@ import { Form as ModelForm } from "../model/Form.js";
  * It has links to the public interface as well as the model.
  * The class is not exposed to the end developer
  */
-export class Form
+export class Form implements ViewComponent
 {
 	private parent$:Parent = null;
 	private model$:ModelForm = null;
