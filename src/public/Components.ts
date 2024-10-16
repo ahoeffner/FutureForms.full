@@ -20,6 +20,8 @@
 */
 
 import { Class } from "./Class.js";
+import { ViewComponent } from "./ViewComponent.js";
+import { Components as ViewComponents } from "../view/Components.js";
 import { ComponentFactory, DefaultViewComponentFactory } from "./ComponentFactory.js";
 
 
@@ -29,19 +31,31 @@ export class Components
       new Map<string,any>();
 
 
-   public static async get(name:string, element:HTMLElement) : Promise<any>
+   public static async create(tagname:string, element:HTMLElement) : Promise<any>
    {
-      let entry:ComponentEntry = this.classes$.get(name.toLowerCase());
+      let entry:ComponentEntry = this.classes$.get(tagname.toLowerCase());
       let factory:ComponentFactory = new entry.factory();
       return(await factory.instantiate(entry.clazz,element));
    }
 
 
-   public static add(name:string, clazz:Class<any>, factory?:Class<ComponentFactory>) : void
+   public static register(tagname:string, clazz:Class<any>, factory?:Class<ComponentFactory>) : void
    {
       if (!factory) factory = DefaultViewComponentFactory;
-      this.classes$.set(name.toLowerCase(),new ComponentEntry(clazz,factory));
+      this.classes$.set(tagname.toLowerCase(),new ComponentEntry(clazz,factory));
    }
+
+
+	public static addViewObject(comp:ViewComponent) : void
+	{
+		ViewComponents.add(comp);
+	}
+
+
+	public static removeViewObject(comp:ViewComponent) : void
+	{
+		ViewComponents.remove(comp);
+	}
 }
 
 

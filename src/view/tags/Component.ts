@@ -34,7 +34,7 @@ export class Component extends ComponentTag
   public async consume(element:HTMLElement, attr:string): Promise<boolean>
   {
     let name:string = element.getAttribute(attr);
-    let comp:any = Components.get(name,element);
+    let comp:any = Components.create(name,element);
     return(comp);
   }
 }

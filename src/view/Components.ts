@@ -31,23 +31,23 @@ export class Components
    	new Map<HTMLElement,ViewComponent>();
 
 
-	public static add(form:ViewComponent) : void
+	public static add(comp:ViewComponent) : void
 	{
-		let elem:HTMLElement = form?.getView();
+		let elem:HTMLElement = comp?.getView();
 
 		if (elem)
 		{
-			Components.comps$.set(form,elem);
-			Components.views$.set(elem,form);
+			Components.comps$.set(comp,elem);
+			Components.views$.set(elem,comp);
 		}
 	}
 
 
-	public static remove(form:ViewComponent) : void
+	public static remove(comp:ViewComponent) : void
 	{
-		let view:HTMLElement = this.comps$.get(form);
+		let view:HTMLElement = this.comps$.get(comp);
 
-		Components.comps$.delete(form);
+		Components.comps$.delete(comp);
 		Components.views$.delete(view);
 	}
 
