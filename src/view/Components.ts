@@ -19,18 +19,19 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Component } from "../public/Component.js";
+import { ViewComponent } from "../public/ViewComponent.js";
+
 
 export class Components
 {
-	private static comps$:Map<Component,HTMLElement> =
-		new Map<Component,HTMLElement>();
+	private static comps$:Map<ViewComponent,HTMLElement> =
+		new Map<ViewComponent,HTMLElement>();
 
-	private static views$:Map<HTMLElement,Component> =
-   	new Map<HTMLElement,Component>();
+	private static views$:Map<HTMLElement,ViewComponent> =
+   	new Map<HTMLElement,ViewComponent>();
 
 
-	public static add(form:Component) : void
+	public static add(form:ViewComponent) : void
 	{
 		let elem:HTMLElement = form?.getView();
 
@@ -42,7 +43,7 @@ export class Components
 	}
 
 
-	public static remove(form:Component) : void
+	public static remove(form:ViewComponent) : void
 	{
 		let view:HTMLElement = this.comps$.get(form);
 
@@ -51,9 +52,9 @@ export class Components
 	}
 
 
-	public static getComponent(element:HTMLElement) : Component
+	public static getComponent(element:HTMLElement) : ViewComponent
 	{
-		let comp:Component = null;
+		let comp:ViewComponent = null;
 
 		while(element && element != document.body)
 		{

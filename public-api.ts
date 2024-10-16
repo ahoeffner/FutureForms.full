@@ -21,5 +21,5 @@ export { ComponentTag } from './src/view/tags/ComponentTag.js';
 export { Form } from './src/public/Form.js';
 export { Parser } from './src/view/Parser.js';
 export { Source } from './src/model/Source.js';
-export { Components } from './src/public/Components.js';
+export { ViewComponents as Components } from './src/public/ViewComponents.js';
 export { FormsModule } from './src/public/FormsModule.js';

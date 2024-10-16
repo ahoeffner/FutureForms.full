@@ -19,8 +19,8 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Component } from "../public/Component.js";
 import { Components } from "../view/Components.js";
+import { ViewComponent } from "../public/ViewComponent.js";
 
 
 export class EventHandler implements EventListenerObject
@@ -87,7 +87,7 @@ export class EventHandler implements EventListenerObject
 
 		if (event.target instanceof HTMLElement)
 		{
-			let comp:Component = Components.getComponent(event.target)
+			let comp:ViewComponent = Components.getComponent(event.target)
 			console.log("component: "+comp?.constructor.name+" "+event.type);
 		}
    }

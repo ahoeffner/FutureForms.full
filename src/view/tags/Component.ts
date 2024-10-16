@@ -20,7 +20,7 @@
 */
 
 import { ComponentTag } from "./ComponentTag.js";
-import { Components } from "../../public/Components.js";
+import { ViewComponents } from "../../public/ViewComponents.js";
 
 
 /**
@@ -34,7 +34,7 @@ export class Component extends ComponentTag
   public async consume(element:HTMLElement, attr:string): Promise<boolean>
   {
     let name:string = element.getAttribute(attr);
-    let comp:any = Components.get(name,element);
+    let comp:any = ViewComponents.get(name,element);
     return(comp);
   }
 }
