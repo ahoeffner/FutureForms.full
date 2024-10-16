@@ -19,53 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Form } from "./Form.js";
-
-export class Forms
+export interface Component
 {
-	private static forms$:Map<Form,HTMLElement> =
-		new Map<Form,HTMLElement>();
-
-	private static views$:Map<HTMLElement,Form> =
-   	new Map<HTMLElement,Form>();
-
-
-	public static add(form:Form) : void
-	{
-		let elem:HTMLElement = form?.getView();
-
-		if (elem)
-		{
-			Forms.forms$.set(form,elem);
-			Forms.views$.set(elem,form);
-		}
-		else
-		{
-			Forms.remove(form);
-		}
-	}
-
-
-	public static remove(form:Form) : void
-	{
-		let view:HTMLElement = this.forms$.get(form);
-
-		Forms.forms$.delete(form);
-		Forms.views$.delete(view);
-	}
-
-
-	public static getActiveForm(element:HTMLElement) : Form
-	{
-		let form:Form = null;
-
-		while(element != document.body)
-		{
-			form = this.views$.get(element);
-			element = element.parentElement;
-			if (form) break;
-		}
-
-		return(form);
-	}
+	getView() : HTMLElement;
 }

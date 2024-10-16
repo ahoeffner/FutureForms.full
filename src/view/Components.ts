@@ -19,39 +19,50 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { Component } from "../public/Component.js";
 
-import { Form as View} from "../view/Form.js";
-import { Form as Model} from "../model/Form.js";
-import { Components } from "../view/Components.js";
-
-
-export class Form
+export class Components
 {
-	private view$:View;
-	private model$:Model;
+	private static comps$:Map<Component,HTMLElement> =
+		new Map<Component,HTMLElement>();
+
+	private static views$:Map<HTMLElement,Component> =
+   	new Map<HTMLElement,Component>();
 
 
-   constructor(view?:HTMLElement)
-   {
-      this.view$ = new View(this);
-		this.model$ = new Model(this);
-
-		this.model$.view = this.view$;
-		this.view$.model = this.model$;
-
-		if (view) this.setView(view);
-   }
-
-
-	public get name() : string
+	public static add(form:Component) : void
 	{
-		return(this.constructor.name);
+		let elem:HTMLElement = form?.getView();
+
+		if (elem)
+		{
+			Components.comps$.set(form,elem);
+			Components.views$.set(elem,form);
+		}
 	}
 
 
-   public async setView(view:HTMLElement) : Promise<void>
-   {
-      await this.view$.setView(view);
-		Components.add(this.view$);
-   }
+	public static remove(form:Component) : void
+	{
+		let view:HTMLElement = this.comps$.get(form);
+
+		Components.comps$.delete(form);
+		Components.views$.delete(view);
+	}
+
+
+	public static getComponent(element:HTMLElement) : Component
+	{
+		let comp:Component = null;
+
+		while(element && element != document.body)
+		{
+			comp = this.views$.get(element);
+			if (comp) break;
+
+			element = element.parentElement;
+		}
+
+		return(comp);
+	}
 }
