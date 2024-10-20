@@ -1,7 +1,7 @@
 /*
   MIT License
 
-  Copyright © 2023 Alex Høffner
+  Copyright © 2024 Alex Høffner
 
   Permission is hereby granted, free of charge, to any person obtaining a copy of this software
   and associated documentation files (the “Software”), to deal in the Software without
