@@ -19,7 +19,9 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-export interface ViewComponent
+export interface ViewComponent extends EventListenerObject
 {
+	pause() : void;
+	resume() : void;
 	getView() : HTMLElement;
 }

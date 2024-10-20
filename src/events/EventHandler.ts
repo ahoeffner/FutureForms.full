@@ -25,17 +25,10 @@ import { ViewComponent } from "../public/ViewComponent.js";
 
 export class EventHandler implements EventListenerObject
 {
-   private defer$:boolean = false;
-
-   private static deferable$:string[] =
-   [
-      "click",
-      "focusin"
-   ]
-
    private static fkeys$:string[] =
    [
       'Tab',
+      'Enter',
       'Escape',
       'PageUp',
       'PageDown',
@@ -55,6 +48,8 @@ export class EventHandler implements EventListenerObject
       'F12'
    ];
 
+	private static current$:ViewComponent = null;
+
 
    /**
     * Add the necessary events
@@ -65,6 +60,7 @@ export class EventHandler implements EventListenerObject
 
 		document.body.addEventListener("click",handler);
 		document.body.addEventListener("input",handler);
+		document.body.addEventListener("focus",handler);
 		document.body.addEventListener("keydown",handler);
 		document.body.addEventListener("focusin",handler);
    }
@@ -79,26 +75,27 @@ export class EventHandler implements EventListenerObject
     */
    public handleEvent(event:Event) : void
    {
-      if (this.defer$ && EventHandler.deferable$.includes(event.type))
-      {
-         this.defer$ = false;
-         return;
-      }
-
 		if (event.target instanceof HTMLElement)
 		{
 			let comp:ViewComponent = Components.getComponent(event.target)
-			console.log("component: "+comp?.constructor.name+" "+event.type);
+
+			if (event.type == "focusin")
+			{
+				if (comp != EventHandler.current$)
+				{
+					if (EventHandler.current$)
+					{
+						let detail:any = {targetElement: EventHandler.current$.getView()};
+						let leave:CustomEvent = new CustomEvent("blur", {detail: detail});
+						EventHandler.current$.handleEvent(leave);
+					}
+
+					EventHandler.current$ = comp;
+				}
+			}
+
+			if (comp)
+				comp.handleEvent(event);
 		}
-   }
-
-
-   /**
-    * @param event The event to be deferred
-    */
-   public deferEvent(event:Event) : void
-   {
-      if (EventHandler.deferable$.includes(event.type))
-         this.defer$ = true;
    }
 }

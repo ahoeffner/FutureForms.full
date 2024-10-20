@@ -57,6 +57,14 @@ export class Form implements ViewComponent
 		this.model$ = form;
 	}
 
+	public pause() : void
+	{
+	}
+
+	public resume() : void
+	{
+	}
+
 	public getView() : HTMLElement
 	{
 		return(this.view$);
@@ -70,4 +78,11 @@ export class Form implements ViewComponent
       let parser:Parser = new Parser();
       await parser.parse(this.view$);
    }
+
+
+	public handleEvent(event:Event) : void
+	{
+		console.log(event)
+		//console.log(event.type+" "+event.target["tagName"]);
+	}
 }
