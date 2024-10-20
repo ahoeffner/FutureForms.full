@@ -1,0 +1,8 @@
+find .. -type f -name "*.ts" | \
+
+while read filename
+do
+	changed=`echo $filename | sed 's/\.ts/.ch/'`
+	sed 's/Copyright © 2023/Copyright © 2024/' $filename > $changed
+	
+done
