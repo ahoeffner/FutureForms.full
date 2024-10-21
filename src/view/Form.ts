@@ -82,7 +82,11 @@ export class Form implements ViewComponent
 
 	public handleEvent(event:Event) : void
 	{
-		console.log(event)
-		//console.log(event.type+" "+event.target["tagName"]);
+		if (event instanceof CustomEvent)
+		{
+			console.log(event.detail.targetElement.tagName)
+		}
+		else
+		console.log(event.type+" "+event.target["tagName"]);
 	}
 }
