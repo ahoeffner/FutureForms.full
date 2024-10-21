@@ -38,6 +38,13 @@ export class ViewMediator
 
 	public block(element:HTMLElement) : void
 	{
+		// Drop focus on the element before blocking
+		if (document.activeElement instanceof HTMLElement)
+		{
+			if (element.contains(document.activeElement))
+				document.activeElement.blur();
+		}
+
 		let overlay:HTMLDivElement = document.createElement('div');
 
 		let top:number = element.offsetTop;

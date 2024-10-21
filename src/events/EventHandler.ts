@@ -25,7 +25,7 @@ import { ViewComponent } from "../public/ViewComponent.js";
 
 export class EventHandler implements EventListenerObject
 {
-   private static fkeys$:string[] =
+   private static keys$:string[] =
    [
       'Tab',
       'Enter',
@@ -104,7 +104,16 @@ export class EventHandler implements EventListenerObject
 			}
 
 			if (comp)
+			{
+				if (event instanceof KeyboardEvent) console.log(event.key)
+				if (event instanceof KeyboardEvent && !EventHandler.keys$.includes(event.key))
+				{
+					console.log("skip")
+					return;
+				}
+				//if (event.type.indexOf("key") >= 0 && event.key )
 				comp.handleEvent(event);
+			}
 		}
    }
 }
