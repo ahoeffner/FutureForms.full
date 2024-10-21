@@ -22,23 +22,40 @@
 
 export class ViewMediator
 {
-	public static DefaultFormMediator:ViewMediator = new ViewMediator();
+	private static current$:ViewMediator = new ViewMediator();
+
+
+	public static get impl() : ViewMediator
+	{
+		return(ViewMediator.current$);
+	}
+
+	public static set impl(mediator:ViewMediator)
+	{
+		ViewMediator.current$ = mediator;
+	}
 
 
 	public block(element:HTMLElement) : void
 	{
 		let overlay:HTMLDivElement = document.createElement('div');
 
+		let top:number = element.offsetTop;
+		let left:number = element.offsetLeft;
+		let width:number = element.offsetWidth;
+		let height:number = element.offsetHeight;
+
 		overlay.style.position = 'absolute';
 
-		overlay.style.top = '0';
-		overlay.style.left = '0';
-		overlay.style.width = '100%';
-		overlay.style.height = '100%';
-		overlay.classList.add('blocked');
+		overlay.style.top = top+"px";
+		overlay.style.left = left+"px";
+		overlay.style.width = width+"px";
+		overlay.style.height = height+"px";
 
-		overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+		overlay.classList.add("blocked");
+		overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
 
+		overlay.addEventListener("click",(event) => {event.stopPropagation()});
 		element.appendChild(overlay);
 	}
 

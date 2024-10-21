@@ -76,16 +76,26 @@ export class EventHandler implements EventListenerObject
    {
 		if (event.target instanceof HTMLElement)
 		{
-			let comp:ViewComponent = Components.getComponent(event.target)
+			let comp:ViewComponent = Components.getComponent(event.target);
 
 			if (event.type == "focusin")
 			{
 				if (comp != EventHandler.current$)
 				{
+					let detail:any = null;
+					let leave:CustomEvent = null;
+
+					if (comp)
+					{
+						detail = {targetElement: comp.getView()};
+						leave = new CustomEvent("focus",{detail: detail});
+						comp.handleEvent(leave);
+					}
+
 					if (EventHandler.current$)
 					{
-						let detail:any = {targetElement: EventHandler.current$.getView()};
-						let leave:CustomEvent = new CustomEvent("focusout",{detail: detail});
+						detail = {targetElement: EventHandler.current$.getView()};
+						leave = new CustomEvent("blur",{detail: detail});
 						EventHandler.current$.handleEvent(leave);
 					}
 

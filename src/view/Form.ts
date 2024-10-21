@@ -23,6 +23,7 @@ import { Parser } from "./Parser.js";
 import { Form as Parent } from "../public/Form.js";
 import { Form as ModelForm } from "../model/Form.js";
 import { ViewComponent } from "../public/ViewComponent.js";
+import { ViewMediator } from "../public/ViewMediator.js";
 
 
 /**
@@ -84,9 +85,14 @@ export class Form implements ViewComponent
 	{
 		if (event instanceof CustomEvent)
 		{
-			console.log(event.detail.targetElement.tagName)
+			console.log(event.type+" "+event.detail.targetElement.tagName)
+			ViewMediator.impl.block(this.view$);
+			setTimeout(() => {ViewMediator.impl.unblock(this.view$);},10000)
 		}
 		else
-		console.log(event.type+" "+event.target["tagName"]);
+		{
+			console.log(event.type+" "+event.target["tagName"]);
+		}
+
 	}
 }
