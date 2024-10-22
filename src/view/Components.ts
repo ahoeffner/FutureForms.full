@@ -66,4 +66,12 @@ export class Components
 
 		return(comp);
 	}
+
+
+	public static getComponents() : ViewComponent[]
+	{
+		let comps:ViewComponent[] = [];
+		Components.comps$.forEach((_html,comp) => comps.push(comp));
+		return(comps);
+	}
 }

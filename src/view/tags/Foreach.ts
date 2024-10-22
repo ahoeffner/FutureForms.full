@@ -20,11 +20,12 @@
 */
 
 import { Tag } from "./Tag.js";
+import { Properties } from "../../public/Properties.js";
 
 
 export class Foreach extends Tag
 {
-	public identifier:string = "foreach";
+	public identifier:string = Properties.tags.foreach;
 
    public replace(element:HTMLElement, attr?:string) : HTMLElement[]
    {

@@ -19,23 +19,15 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { ComponentTag } from "./ComponentTag.js";
-import { Components } from "../../public/Components.js";
-import { Properties } from "../../public/Properties.js";
-
-
-/**
- * This tag will construct a Component
- * and subsequently consume the element body
- */
-export class Component extends ComponentTag
+export class Tags
 {
-	public identifier:string = Properties.tags.component;
+	public from:string = "from";
+	public foreach:string = "foreach";
+	public component:string = "component";
+}
 
-	public async consume(element:HTMLElement, attr:string): Promise<boolean>
-	{
-		let name:string = element.getAttribute(attr);
-   	let comp:any = await Components.create(name,element);
-   	return(comp);
-	}
+
+export class Properties
+{
+	public static tags:Tags = new Tags();
 }

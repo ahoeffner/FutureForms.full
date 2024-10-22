@@ -126,7 +126,9 @@ export class Parser
 
       if (tag != null)
       {
-         if (tag instanceof ComponentTag) return(this.consume(clazz,tag,element,null));
+         if (tag instanceof ComponentTag)
+				return(await this.consume(clazz,tag,element,null));
+
          replace = await this.getTagReplacement(clazz,tag,element,null,skip);
          await this.replace(element,replace);
          return(true);
@@ -143,7 +145,9 @@ export class Parser
 
          if (tag != null)
          {
-            if (tag instanceof ComponentTag) return(this.consume(clazz,tag,element,attr));
+				if (tag instanceof ComponentTag)
+					return(await this.consume(clazz,tag,element,attr));
+
             replace = await this.getTagReplacement(clazz,tag,element,attr,skip);
             await this.replace(element,replace);
             return(true);
@@ -213,7 +217,8 @@ export class Parser
    private async consume(clazz:Class<Tag>, tag:ComponentTag, element:Node, attr:string) : Promise<boolean>
    {
       let comp:any = tag.consume(element as HTMLElement,attr);
-      if (comp instanceof Promise) await comp;
+      if (comp instanceof Promise) comp = await comp;
+		if (!comp) return(false);
 
       let comps:any[] = this.comps$.get(clazz);
       if (!comps) { comps = []; this.comps$.set(clazz,comps)}
