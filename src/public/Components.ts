@@ -20,20 +20,36 @@
 */
 
 import { Class } from "./Class.js";
+import { Window } from "../view/Window.js";
 import { ViewComponent } from "./ViewComponent.js";
 import { Components as ViewComponents } from "../view/Components.js";
 import { ComponentFactory, DefaultViewComponentFactory } from "./ComponentFactory.js";
 
 
+class ComponentEntry
+{
+   constructor(public clazz:Class<any>, public factory:Class<ComponentFactory>) {}
+}
+
 export class Components
 {
    private static classes$:Map<string,ComponentEntry> =
-      new Map<string,any>();
+      Components.buildins();
+
+
+	private static buildins() : Map<string,any>
+	{
+		let buildins:Map<string,any> = new Map<string,any>();
+		buildins.set("window",new ComponentEntry(Window,DefaultViewComponentFactory));
+		return(buildins);
+	}
 
 
    public static async create(tagname:string, element:HTMLElement) : Promise<any>
    {
       let entry:ComponentEntry = this.classes$.get(tagname.toLowerCase());
+		if (!entry) return(null);
+
       let factory:ComponentFactory = new entry.factory();
       return(await factory.instantiate(entry.clazz,element));
    }
@@ -56,10 +72,4 @@ export class Components
 	{
 		ViewComponents.remove(comp);
 	}
-}
-
-
-class ComponentEntry
-{
-   constructor(public clazz:Class<any>, public factory:Class<ComponentFactory>) {}
 }

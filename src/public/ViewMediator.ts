@@ -53,13 +53,12 @@ export class ViewMediator
 		let height:number = element.offsetHeight;
 
 		overlay.style.position = 'absolute';
+		overlay.setAttribute("name","dense");
 
 		overlay.style.top = top+"px";
 		overlay.style.left = left+"px";
 		overlay.style.width = width+"px";
 		overlay.style.height = height+"px";
-
-		overlay.classList.add("blocked");
 		overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
 
 		overlay.addEventListener("click",(event) => {event.stopPropagation()});

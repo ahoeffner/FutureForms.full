@@ -20,51 +20,19 @@
 */
 
 import { Parser } from "./Parser.js";
-import { Form as Parent } from "../public/Form.js";
-import { Form as ModelForm } from "../model/Form.js";
-import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 
 
-/**
- * This class handles all view and user interaction related stuff.
- * It has links to the public interface as well as the model.
- * The class is not exposed to the end developer
- */
-export class Form implements ViewComponent
+export class Window implements ViewComponent
 {
-	private parent$:Parent = null;
-	private model$:ModelForm = null;
 	private view$:HTMLElement = null;
 
 
-   constructor(parent:Parent)
-   {
-		this.parent$ = parent;
-   }
-
-	public get parent() : Parent
+	constructor(view?:HTMLElement)
 	{
-		return(this.parent$);
+		console.log("Window "+view)
 	}
 
-	public get model() : ModelForm
-	{
-		return(this.model$);
-	}
-
-	public set model(form:ModelForm)
-	{
-		this.model$ = form;
-	}
-
-	public pause() : void
-	{
-	}
-
-	public resume() : void
-	{
-	}
 
 	public getView() : HTMLElement
 	{
@@ -81,18 +49,20 @@ export class Form implements ViewComponent
    }
 
 
+	public pause() : void
+	{
+		throw new Error("Method not implemented.");
+	}
+
+
+	public resume() : void
+	{
+		throw new Error("Method not implemented.");
+	}
+
+	
 	public handleEvent(event:Event) : void
 	{
-		if (event instanceof CustomEvent)
-		{
-			console.log(event.type+" "+event.detail.targetElement.tagName)
-			ViewMediator.impl.block(this.view$);
-			setTimeout(() => {ViewMediator.impl.unblock(this.view$);},10000)
-		}
-		else
-		{
-			console.log(event.type+" "+event.target["tagName"]);
-		}
-
+		throw new Error("Method not implemented.");
 	}
 }
