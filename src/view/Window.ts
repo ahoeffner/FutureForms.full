@@ -30,7 +30,7 @@ export class Window implements ViewComponent
 
 	constructor(view?:HTMLElement)
 	{
-		console.log("Window "+view)
+		if (view) this.setView(view);
 	}
 
 
@@ -60,7 +60,7 @@ export class Window implements ViewComponent
 		throw new Error("Method not implemented.");
 	}
 
-	
+
 	public handleEvent(event:Event) : void
 	{
 		throw new Error("Method not implemented.");

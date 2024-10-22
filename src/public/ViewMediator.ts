@@ -53,7 +53,7 @@ export class ViewMediator
 		let height:number = element.offsetHeight;
 
 		overlay.style.position = 'absolute';
-		overlay.setAttribute("name","dense");
+		overlay.setAttribute("name","impassable");
 
 		overlay.style.top = top+"px";
 		overlay.style.left = left+"px";

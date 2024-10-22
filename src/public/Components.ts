@@ -62,6 +62,12 @@ export class Components
    }
 
 
+	public static getViewObject(element:HTMLElement) : ViewComponent
+	{
+		return(ViewComponents.getComponent(element));
+	}
+
+
 	public static addViewObject(comp:ViewComponent) : void
 	{
 		ViewComponents.add(comp);
