@@ -25,6 +25,7 @@ import { ViewComponent } from "../public/ViewComponent.js";
 
 export class Window implements ViewComponent
 {
+	private comps$:any = [];
 	private view$:HTMLElement = null;
 
 
@@ -46,6 +47,8 @@ export class Window implements ViewComponent
 
       let parser:Parser = new Parser();
       await parser.parse(this.view$);
+
+		this.comps$ = parser.getComponents();
    }
 
 

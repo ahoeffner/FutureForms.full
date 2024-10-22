@@ -72,9 +72,15 @@ export class Parser
    }
 
 
-   public getComponents(clazz:Class<Tag>) : any[]
+   public getComponents(clazz?:Class<Tag>) : any[]
    {
-      return(this.comps$.get(clazz));
+		if (clazz)
+      	return(this.comps$.get(clazz));
+
+		let all:any[] = [];
+		this.comps$.forEach((comps) => all.push(...comps));
+
+		return(all);
    }
 
 
