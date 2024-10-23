@@ -21,20 +21,23 @@
 
 import { Parser } from "./Parser.js";
 import { Components } from "./Components.js";
-import { ViewComponent } from "../public/ViewComponent.js";
+import { Window as Parent } from "../public/Window.js";
 import { ViewMediator } from "../public/ViewMediator.js";
+import { ViewComponent } from "../public/ViewComponent.js";
 
 
 export class Window implements ViewComponent
 {
 	private comps$:any[] = [];
+	private window$:Parent = null;
 	private view$:HTMLElement = null;
 	private parent$:ViewComponent = null;
 
 
-	constructor(view?:HTMLElement)
+	constructor(window:Parent)
 	{
-		if (view) this.setView(view);
+		this.window$ = window;
+		Components.bind(this.window$,this);
 	}
 
 	public get parent() : ViewComponent
@@ -80,6 +83,12 @@ export class Window implements ViewComponent
 
 		this.comps$ = parser.getComponents();
 
+		this.comps$.forEach((comp) =>
+		{
+			comp = Components.getViewComponent(comp);
+			if (comp) comp.parent = this;
+		})
+
 		this.view$ = view;
 		Components.add(this);
    }
@@ -99,6 +108,6 @@ export class Window implements ViewComponent
 
 	public handleEvent(event:Event) : void
 	{
-		console.log("Window "+event.type)
+		console.log("Window: "+event.type+" custom: "+(event instanceof CustomEvent))
 	}
 }

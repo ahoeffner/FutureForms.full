@@ -43,6 +43,7 @@ export class Form implements ViewComponent
    constructor(form:Parent)
    {
 		this.form$ = form;
+		Components.bind(this.form$,this);
    }
 
 	public get form() : Parent
@@ -94,12 +95,13 @@ export class Form implements ViewComponent
       await parser.parse(view);
 
 		this.view$ = view;
-		Components.add(this,this.form$);
+
+		Components.add(this);
    }
 
 
 	public handleEvent(event:Event) : void
 	{
-		console.log("Form "+event.type)
+		console.log("Form: "+event.type+" custom: "+(event instanceof CustomEvent))
 	}
 }

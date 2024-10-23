@@ -19,34 +19,23 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Class } from "./Class.js";
-import { ComponentFactory, DefaultViewComponentFactory } from "./ComponentFactory.js";
+import { Window as View } from "../view/Window.js";
 
 
-class ComponentEntry
+export class Window
 {
-   constructor(public clazz:Class<any>, public factory:Class<ComponentFactory>) {}
-}
-
-export class Components
-{
-   private static classes$:Map<string,ComponentEntry> =
-		new Map<string,any>();
+	private view$:View;
 
 
-   public static async create(tagname:string, element:HTMLElement) : Promise<any>
+	constructor(view?:HTMLElement)
+	{
+		this.view$ = new View(this);
+		if (view) this.setView(view);
+	}
+
+
+   public async setView(view:HTMLElement) : Promise<void>
    {
-      let entry:ComponentEntry = this.classes$.get(tagname.toLowerCase());
-		if (!entry) return(null);
-
-      let factory:ComponentFactory = new entry.factory();
-      return(await factory.instantiate(entry.clazz,element));
-   }
-
-
-   public static register(tagname:string, clazz:Class<any>, factory?:Class<ComponentFactory>) : void
-   {
-      if (!factory) factory = DefaultViewComponentFactory;
-      this.classes$.set(tagname.toLowerCase(),new ComponentEntry(clazz,factory));
+      await this.view$.setView(view);
    }
 }

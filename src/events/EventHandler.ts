@@ -78,25 +78,25 @@ export class EventHandler implements EventListenerObject
 		{
 			let comp:ViewComponent = Components.getComponent(event.target);
 
-			if (event.type == "focusin")
+			if (event.type == "focusin" || event.type == "click")
 			{
 				if (comp != EventHandler.current$)
 				{
 					let detail:any = null;
-					let leave:CustomEvent = null;
-
-					if (comp)
-					{
-						detail = {targetElement: comp.getView()};
-						leave = new CustomEvent("focus",{detail: detail});
-						comp.handleEvent(leave);
-					}
+					let cevent:CustomEvent = null;
 
 					if (EventHandler.current$)
 					{
 						detail = {targetElement: EventHandler.current$.getView()};
-						leave = new CustomEvent("blur",{detail: detail});
-						EventHandler.current$.handleEvent(leave);
+						cevent = new CustomEvent("blur",{detail: detail});
+						this.bubble(EventHandler.current$,cevent);
+					}
+
+					if (comp)
+					{
+						detail = {targetElement: comp.getView()};
+						cevent = new CustomEvent("focus",{detail: detail});
+						this.bubble(comp,cevent);
 					}
 
 					EventHandler.current$ = comp;
@@ -105,15 +105,21 @@ export class EventHandler implements EventListenerObject
 
 			if (comp)
 			{
-				if (event instanceof KeyboardEvent) console.log(event.key)
 				if (event instanceof KeyboardEvent && !EventHandler.keys$.includes(event.key))
-				{
-					console.log("skip")
 					return;
-				}
-				//if (event.type.indexOf("key") >= 0 && event.key )
+
 				comp.handleEvent(event);
 			}
 		}
    }
+
+
+	private bubble(comp:ViewComponent, event:Event) : void
+	{
+		while(comp)
+		{
+			comp.handleEvent(event);
+			comp = comp.parent;
+		}
+	}
 }

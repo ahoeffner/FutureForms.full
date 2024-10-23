@@ -14,16 +14,16 @@ export { TableDefinition } from 'futureforms';
 export { Record, RecordDefinition } from 'futureforms';
 export { Filter, Filters, NameValuePair } from 'futureforms';
 
-export { Properties } from './src/public/Properties.js';
 
 export { Tag } from './src/view/tags/Tag.js';
+export { Parser } from './src/view/Parser.js';
 export { TagLibrary } from './src/view/tags/TagLibrary.js';
 export { ComponentTag } from './src/view/tags/ComponentTag.js';
 
-export { Window } from './src/view/Window.js';
-
 export { Form } from './src/public/Form.js';
-export { Parser } from './src/view/Parser.js';
-export { Source } from './src/model/Source.js';
+export { Window } from './src/public/Window.js';
+export { Properties } from './src/public/Properties.js';
 export { Components } from './src/public/Components.js';
 export { FormsModule } from './src/public/FormsModule.js';
+
+export { Source } from './src/model/Source.js';
