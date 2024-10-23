@@ -22,7 +22,6 @@
 
 import { Form as View} from "../view/Form.js";
 import { Form as Model} from "../model/Form.js";
-import { Components } from "../view/Components.js";
 
 
 export class Form
@@ -52,6 +51,5 @@ export class Form
    public async setView(view:HTMLElement) : Promise<void>
    {
       await this.view$.setView(view);
-		Components.add(this.view$);
    }
 }

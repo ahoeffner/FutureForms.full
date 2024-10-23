@@ -24,31 +24,38 @@ import { ViewComponent } from "../public/ViewComponent.js";
 
 export class Components
 {
-	private static comps$:Map<ViewComponent,HTMLElement> =
-		new Map<ViewComponent,HTMLElement>();
+	private static cmap$:Map<ViewComponent,any> =
+		new Map<ViewComponent,any>();
+
+	private static vmap$:Map<any,ViewComponent> =
+		new Map<any,ViewComponent>();
 
 	private static views$:Map<HTMLElement,ViewComponent> =
    	new Map<HTMLElement,ViewComponent>();
 
 
-	public static add(comp:ViewComponent) : void
+	public static add(view:ViewComponent, comp?:any) : void
 	{
-		let elem:HTMLElement = comp?.getView();
-
-		if (elem)
+		if (comp)
 		{
-			Components.comps$.set(comp,elem);
-			Components.views$.set(elem,comp);
+			this.cmap$.set(view,comp);
+			this.vmap$.set(comp,view);
 		}
+
+		let element:HTMLElement = view?.getView();
+		if (element) Components.views$.set(element,view);
 	}
 
 
-	public static remove(comp:ViewComponent) : void
+	public static remove(view:ViewComponent) : void
 	{
-		let view:HTMLElement = this.comps$.get(comp);
+		let comp:any = this.cmap$.get(view);
 
-		Components.comps$.delete(comp);
-		Components.views$.delete(view);
+		Components.cmap$.delete(view);
+		if (comp) Components.vmap$.delete(comp);
+
+		let element:HTMLElement = view?.getView();
+		if (element) Components.views$.delete(element);
 	}
 
 
@@ -71,7 +78,7 @@ export class Components
 	public static getComponents() : ViewComponent[]
 	{
 		let comps:ViewComponent[] = [];
-		Components.comps$.forEach((_html,comp) => comps.push(comp));
+		Components.cmap$.forEach((_html,comp) => comps.push(comp));
 		return(comps);
 	}
 }

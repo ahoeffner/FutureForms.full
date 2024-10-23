@@ -21,6 +21,8 @@
 
 export interface ViewComponent extends EventListenerObject
 {
+	parent:ViewComponent;
+	
 	pause() : void;
 	resume() : void;
 	getView() : HTMLElement;

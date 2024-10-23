@@ -20,13 +20,16 @@
 */
 
 import { Parser } from "./Parser.js";
+import { Components } from "./Components.js";
 import { ViewComponent } from "../public/ViewComponent.js";
+import { ViewMediator } from "../public/ViewMediator.js";
 
 
 export class Window implements ViewComponent
 {
-	private comps$:any = [];
+	private comps$:any[] = [];
 	private view$:HTMLElement = null;
+	private parent$:ViewComponent = null;
 
 
 	constructor(view?:HTMLElement)
@@ -34,38 +37,68 @@ export class Window implements ViewComponent
 		if (view) this.setView(view);
 	}
 
+	public get parent() : ViewComponent
+	{
+		return(this.parent$);
+	}
+
+	public set parent(parent:ViewComponent)
+	{
+		this.parent$ = parent;
+	}
 
 	public getView() : HTMLElement
 	{
 		return(this.view$);
 	}
 
+	public getComponents() : any[]
+	{
+		return(this.comps$);
+	}
+
+
+	public addComponent(comp:any) : void
+	{
+		this.comps$.push(comp);
+	}
+
+
+	public removeComponent(comp:any) : void
+	{
+		let pos:number = this.comps$.indexOf(comp);
+		if (pos >= 0) this.comps$.splice(pos,1);
+	}
+
 
    public async setView(view:HTMLElement) : Promise<void>
    {
-		this.view$ = view;
+		Components.remove(this);
 
       let parser:Parser = new Parser();
-      await parser.parse(this.view$);
+      await parser.parse(view);
 
 		this.comps$ = parser.getComponents();
+
+		this.view$ = view;
+		Components.add(this);
    }
 
 
 	public pause() : void
 	{
-		throw new Error("Method not implemented.");
+		ViewMediator.impl.block(this.view$);
 	}
 
 
 	public resume() : void
 	{
-		throw new Error("Method not implemented.");
+		ViewMediator.impl.unblock(this.view$);
 	}
 
 
 	public handleEvent(event:Event) : void
 	{
-		throw new Error("Method not implemented.");
+		console.log("Window "+event.type)
 	}
 }

@@ -19,8 +19,10 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { Form } from "./Form.js";
 import { Class } from "./Class.js";
 import { ViewComponent } from "./ViewComponent.js";
+import { Form as ViewForm } from "../view/Form.js";
 import { Components as ViewComponents } from "../view/Components.js";
 import { ComponentFactory, DefaultViewComponentFactory } from "./ComponentFactory.js";
 
@@ -53,6 +55,25 @@ export class Components
    }
 
 
+	public static getForm(element:HTMLElement) : Form
+	{
+		let comp:ViewComponent = this.getViewObject(element);
+		if (comp instanceof ViewForm) return(comp.form);
+		return(null);
+	}
+
+
+	public static getForms() : Form[]
+	{
+		let forms:Form[] = [];
+
+		this.getViewObjects().forEach((comp) =>
+		{ if (comp instanceof ViewForm) forms.push(comp.form) })
+
+		return(forms);
+	}
+
+
 	public static getViewObject(element:HTMLElement) : ViewComponent
 	{
 		return(ViewComponents.getComponent(element));
@@ -62,17 +83,5 @@ export class Components
 	public static getViewObjects() : ViewComponent[]
 	{
 		return(ViewComponents.getComponents());
-	}
-
-
-	public static addViewObject(comp:ViewComponent) : void
-	{
-		ViewComponents.add(comp);
-	}
-
-
-	public static removeViewObject(comp:ViewComponent) : void
-	{
-		ViewComponents.remove(comp);
 	}
 }

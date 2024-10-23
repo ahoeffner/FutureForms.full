@@ -20,6 +20,7 @@
 */
 
 import { Parser } from "./Parser.js";
+import { Components } from "./Components.js";
 import { Form as Parent } from "../public/Form.js";
 import { Form as ModelForm } from "../model/Form.js";
 import { ViewMediator } from "../public/ViewMediator.js";
@@ -33,19 +34,30 @@ import { ViewComponent } from "../public/ViewComponent.js";
  */
 export class Form implements ViewComponent
 {
-	private parent$:Parent = null;
+	private form$:Parent = null;
 	private model$:ModelForm = null;
 	private view$:HTMLElement = null;
+	private parent$:ViewComponent = null;
 
 
-   constructor(parent:Parent)
+   constructor(form:Parent)
    {
-		this.parent$ = parent;
+		this.form$ = form;
    }
 
-	public get parent() : Parent
+	public get form() : Parent
+	{
+		return(this.form$);
+	}
+
+	public get parent() : ViewComponent
 	{
 		return(this.parent$);
+	}
+
+	public set parent(parent:ViewComponent)
+	{
+		this.parent$ = parent;
 	}
 
 	public get model() : ModelForm
@@ -60,10 +72,12 @@ export class Form implements ViewComponent
 
 	public pause() : void
 	{
+		ViewMediator.impl.block(this.view$);
 	}
 
 	public resume() : void
 	{
+		ViewMediator.impl.unblock(this.view$);
 	}
 
 	public getView() : HTMLElement
@@ -74,25 +88,18 @@ export class Form implements ViewComponent
 
    public async setView(view:HTMLElement) : Promise<void>
    {
-		this.view$ = view;
+		Components.remove(this);
 
       let parser:Parser = new Parser();
-      await parser.parse(this.view$);
+      await parser.parse(view);
+
+		this.view$ = view;
+		Components.add(this,this.form$);
    }
 
 
 	public handleEvent(event:Event) : void
 	{
-		if (event instanceof CustomEvent)
-		{
-			console.log(event.type+" "+event.detail.targetElement.tagName)
-			ViewMediator.impl.block(this.view$);
-			setTimeout(() => {ViewMediator.impl.unblock(this.view$);},10000)
-		}
-		else
-		{
-			console.log(event.type+" "+event.target["tagName"]);
-		}
-
+		console.log("Form "+event.type)
 	}
 }

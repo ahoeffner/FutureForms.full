@@ -35,12 +35,13 @@ export class Parser
     * Parse and replace custom tags for the element
     * @param element The html element
     */
-   public async parse(element?:HTMLElement) : Promise<void>
+   public async parse(element?:HTMLElement) : Promise<Parser>
    {
       if (element == null)
 			element = document.body;
 
       await this.parseContent(element);
+		return(this);
    }
 
 
