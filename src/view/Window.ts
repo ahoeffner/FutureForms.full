@@ -89,6 +89,8 @@ export class Window implements ViewComponent
 			if (comp) comp.parent = this;
 		})
 
+		console.log(this.comps$)
+
 		this.view$ = view;
 		Components.add(this);
    }

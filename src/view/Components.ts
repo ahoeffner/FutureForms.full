@@ -48,6 +48,10 @@ export class Components
 		if (!comp || comp satisfies ViewComponent)
 			return(comp);
 
+		console.log("Mapping")
+		console.log(this.comps$)
+		console.log(this.comps$.get(comp))
+
 		return(this.comps$.get(comp));
 	}
 

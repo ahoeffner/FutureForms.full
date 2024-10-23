@@ -118,8 +118,12 @@ export class EventHandler implements EventListenerObject
 	{
 		while(comp)
 		{
+			console.log(comp)
 			comp.handleEvent(event);
-			comp = comp.parent;
+			comp = Components.getViewComponent(comp);
+			console.log(comp)
+			comp = comp?.parent;
+			console.log(comp)
 		}
 	}
 }
