@@ -19,7 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { ViewComponent } from "../public/ViewComponent.js";
+import { isViewComponent, ViewComponent } from "../public/ViewComponent.js";
 
 
 export class Components
@@ -45,12 +45,8 @@ export class Components
 
 	public static getViewComponent(comp:any) : ViewComponent
 	{
-		if (!comp || comp satisfies ViewComponent)
+		if (isViewComponent(comp))
 			return(comp);
-
-		console.log("Mapping")
-		console.log(this.comps$)
-		console.log(this.comps$.get(comp))
 
 		return(this.comps$.get(comp));
 	}

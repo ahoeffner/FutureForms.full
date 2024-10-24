@@ -22,8 +22,22 @@
 export interface ViewComponent extends EventListenerObject
 {
 	parent:ViewComponent;
-	
+
 	pause() : void;
 	resume() : void;
 	getView() : HTMLElement;
+	setView(view:HTMLElement) : Promise<void>
+}
+
+
+export function isViewComponent(object:any) : object is ViewComponent
+{
+	return
+	(
+		object.parent != undefined &&
+		object.pause === "function" &&
+		object.resume === "function" &&
+		object.getView === "function" &&
+		object.setView === "function"
+	);
 }
