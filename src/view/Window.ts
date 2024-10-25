@@ -128,8 +128,14 @@ class MouseHandler
 {
 	private hold:number = 300;
 	private down$:number = null;
+	private move$:boolean = false;
 	private cursor$:string = null;
 	private element$:HTMLElement = null;
+
+	private mouse$:{x:number, y:number} = null;
+	private position$:{x:number, y:number} = null;
+	private boundary$:{x:number, y:number, w:number, h:number} = null;
+
 
 	public set element(element:HTMLElement)
 	{
@@ -137,33 +143,139 @@ class MouseHandler
 		this.cursor$ = element.style.cursor;
 	}
 
-	public handleEvent(event:Event) : void
+
+	public handleEvent(event:MouseEvent) : void
 	{
 		if (event.type.indexOf("mouse") < 0)
 			return;
 
 		if (event.type == "mouseup")
 		{
-			this.element$.style.cursor = this.cursor$;
 			this.down$ = null;
+			this.move$ = false;
+			this.element$.style.cursor = this.cursor$;
 		}
 
 		if (event.type == "mouseout")
+		{
+			this.move$ = false;
 			this.element$.style.cursor = this.cursor$;
+		}
+
+		if (event.type == "mousemove" && this.move$)
+		{
+			event.preventDefault();
+			this.move(event,this.element$);
+		}
 
 		if (event.type == "mousedown")
 		{
 			this.down$ = Date.now();
-			setTimeout(() => {this.armed(this.element$)},this.hold);
+			setTimeout(() => {this.prepare(this.element$)},this.hold);
 		}
 	}
 
 
-	private armed(window:HTMLElement) : void
+	private prepare(element:HTMLElement) : void
 	{
-		if (this.down$ && Date.now() - this.down$ > this.hold)
+		this.move$ = false;
+
+		this.mouse$ = null;
+		this.position$ = null;
+		this.boundary$ = null;
+
+		if (!this.down$ || Date.now() - this.down$ < this.hold)
+			return;
+
+		this.move$ = true;
+		this.mouse$ = {x: 0, y: 0};
+		element.style.cursor = "move";
+
+		this.position$ =
 		{
-			window.style.cursor = "move";
+			y: +element.offsetTop + +element.offsetHeight,
+			x: +element.offsetLeft + +element.offsetWidth
 		}
+
+		this.boundary$ =
+		{
+			y: element.parentElement.offsetTop,
+			x: element.parentElement.offsetLeft,
+			w: element.parentElement.offsetWidth,
+			h: element.parentElement.offsetHeight
+		};
+
+		let type:string = window.getComputedStyle(element.parentElement).position;
+
+		if (type == "static") type = "";
+		if (type == "fixed")	type = "absolute";
+		if (type == "sticky") type = "relative";
+
+		switch(type)
+		{
+			case "" :
+
+				this.boundary$.w += this.boundary$.x;
+				this.boundary$.h += this.boundary$.y;
+
+				this.position$.y -= element.offsetTop;
+				this.position$.x -= element.offsetLeft;
+
+				break;
+
+			case "absolute" :
+
+				this.boundary$.x = 0;
+				this.boundary$.y = 0;
+
+				let parent:HTMLElement = element.parentElement;
+
+				this.boundary$.w = parent.parentElement.clientWidth;
+				this.boundary$.h = parent.parentElement.clientHeight;
+
+				break;
+
+			case "relative" :
+
+				this.boundary$.x = 0;
+				this.boundary$.y = 0;
+
+				break;
+		}
+
+		console.log(this.position$)
+		console.log(this.boundary$)
+	}
+
+
+	private move(event:MouseEvent, element:HTMLElement) : void
+	{
+		let offX:number = event.clientX - this.mouse$.x;
+		let offY:number = event.clientY - this.mouse$.y;
+
+		let elemY:number = element.offsetTop;
+		let elemX:number = element.offsetLeft;
+		let elemW:number = element.offsetWidth;
+		let elemH:number = element.offsetHeight;
+
+		let posX:number = elemX + offX;
+		let posY:number = elemY + offY;
+
+		let minX:number = this.boundary$.x;
+		let minY:number = this.boundary$.y;
+
+		let maxX:number = this.boundary$.w - elemW;
+		let maxY:number = this.boundary$.h - elemH;
+
+		if (posX < minX) posX = minX;
+		if (posY < minY) posY = minY;
+
+		if (posX > maxX) posX = maxX;
+		if (posY > maxY) posY = maxY;
+
+		element.style.top = posY + "px";
+		element.style.left = posX + "px";
+
+		this.mouse$ = {x: event.clientX, y: event.clientY};
 	}
 }
