@@ -22,6 +22,7 @@
 
 export class ViewMediator
 {
+	public static zindex:number = 1;
 	private static current$:ViewMediator = new ViewMediator();
 
 
@@ -33,6 +34,12 @@ export class ViewMediator
 	public static set impl(mediator:ViewMediator)
 	{
 		ViewMediator.current$ = mediator;
+	}
+
+
+	public bring2front(element:HTMLElement) : void
+	{
+		element.style.zIndex = (++ViewMediator.zindex)+"";
 	}
 
 

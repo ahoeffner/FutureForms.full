@@ -32,6 +32,7 @@ export class Window implements ViewComponent
 	private window$:Parent = null;
 	private view$:HTMLElement = null;
 	private parent$:ViewComponent = null;
+	private mhandler:MouseHandler = new MouseHandler();
 
 
 	constructor(window:Parent)
@@ -91,6 +92,15 @@ export class Window implements ViewComponent
 
 		this.view$ = view;
 		Components.add(this);
+
+		this.mhandler.element = this.view$;
+
+		this.view$.addEventListener("mouseout",this);
+		this.view$.addEventListener("mouseover",this);
+
+		this.view$.addEventListener("mouseup",this);
+		this.view$.addEventListener("mousemove",this);
+		this.view$.addEventListener("mousedown",this);
    }
 
 
@@ -108,6 +118,52 @@ export class Window implements ViewComponent
 
 	public handleEvent(event:Event) : void
 	{
-		console.log("Window: "+event.type+" custom: "+(event instanceof CustomEvent))
+		if (event instanceof MouseEvent)
+			this.mhandler.handleEvent(event);
+	}
+}
+
+
+class MouseHandler
+{
+	private hold:number = 300;
+	private down$:number = null;
+	private cursor$:string = null;
+	private element$:HTMLElement = null;
+
+	public set element(element:HTMLElement)
+	{
+		this.element$ = element;
+		this.cursor$ = element.style.cursor;
+	}
+
+	public handleEvent(event:Event) : void
+	{
+		if (event.type.indexOf("mouse") < 0)
+			return;
+
+		if (event.type == "mouseup")
+		{
+			this.element$.style.cursor = this.cursor$;
+			this.down$ = null;
+		}
+
+		if (event.type == "mouseout")
+			this.element$.style.cursor = this.cursor$;
+
+		if (event.type == "mousedown")
+		{
+			this.down$ = Date.now();
+			setTimeout(() => {this.armed(this.element$)},this.hold);
+		}
+	}
+
+
+	private armed(window:HTMLElement) : void
+	{
+		if (this.down$ && Date.now() - this.down$ > this.hold)
+		{
+			window.style.cursor = "move";
+		}
 	}
 }
