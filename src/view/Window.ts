@@ -188,13 +188,13 @@ class MouseHandler
 			return;
 
 		this.move$ = true;
-		this.mouse$ = {x: 0, y: 0};
+		this.mouse$ = {x: -1, y: -1};
 		element.style.cursor = "move";
 
 		this.position$ =
 		{
-			y: +element.offsetTop + +element.offsetHeight,
-			x: +element.offsetLeft + +element.offsetWidth
+			y: +element.offsetTop,
+			x: +element.offsetLeft
 		}
 
 		this.boundary$ =
@@ -242,14 +242,21 @@ class MouseHandler
 
 				break;
 		}
-
-		console.log(this.position$)
-		console.log(this.boundary$)
 	}
 
 
 	private move(event:MouseEvent, element:HTMLElement) : void
 	{
+		if (this.mouse$.x < 0)
+		{
+			this.mouse$.x = event.clientX;
+			this.mouse$.y = event.clientY;
+			console.log("mouse (x,y) "+this.mouse$.x+" "+this.mouse$.y)
+			console.log(this.mouse$);
+			console.log("element (x,y) "+element.offsetLeft+" "+element.offsetTop);
+			return;
+		}
+
 		let offX:number = event.clientX - this.mouse$.x;
 		let offY:number = event.clientY - this.mouse$.y;
 
@@ -258,14 +265,14 @@ class MouseHandler
 		let elemW:number = element.offsetWidth;
 		let elemH:number = element.offsetHeight;
 
-		let posX:number = elemX + offX;
-		let posY:number = elemY + offY;
+		let posX:number = this.position$.x + offX;
+		let posY:number = this.position$.y + offY;
 
 		let minX:number = this.boundary$.x;
 		let minY:number = this.boundary$.y;
 
-		let maxX:number = this.boundary$.w - elemW;
-		let maxY:number = this.boundary$.h - elemH;
+		let maxX:number = this.boundary$.w + elemW;
+		let maxY:number = this.boundary$.h + elemH;
 
 		if (posX < minX) posX = minX;
 		if (posY < minY) posY = minY;
@@ -275,7 +282,5 @@ class MouseHandler
 
 		element.style.top = posY + "px";
 		element.style.left = posX + "px";
-
-		this.mouse$ = {x: event.clientX, y: event.clientY};
 	}
 }
