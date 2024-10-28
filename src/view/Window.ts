@@ -140,6 +140,7 @@ class MouseHandler
 
 	public set element(element:HTMLElement)
 	{
+		this.adjust(element);
 		this.element$ = element;
 		this.cursor$ = element.style.cursor;
 	}
@@ -151,102 +152,102 @@ class MouseHandler
 			return;
 
 		if (event.type == "mouseup")
-		{
-			this.down$ = null;
-			this.move$ = false;
-			this.element$.style.cursor = this.cursor$;
-		}
+			this.leave(event,this.element$);
 
-		if (event.type == "mouseout")
-		{
-			this.move$ = false;
-			this.element$.style.cursor = this.cursor$;
-		}
-
-		if (event.type == "mousemove" && this.move$)
-		{
-			event.preventDefault();
-			this.move(event,this.element$);
-		}
+		if (event.type == "mouseout" && event.target == this.element$)
+			this.leave(event,this.element$);
 
 		if (event.type == "mousedown")
 		{
-			this.down$ = Date.now();
-			setTimeout(() => {this.prepare(this.element$)},this.hold);
+			this.init(event,this.element$);
+			setTimeout(() => {this.check(this.element$)},this.hold);
 		}
+
+		if (event.type == "mousemove")
+			this.move(event,this.element$);
 	}
 
 
-	private prepare(element:HTMLElement) : void
+	private check(element:HTMLElement) : void
 	{
 		this.move$ = false;
-
-		this.mouse$ = null;
-		this.postype$ = null;
-		this.position$ = null;
-		this.boundary$ = null;
 
 		if (!this.down$ || Date.now() - this.down$ < this.hold)
 			return;
 
 		this.move$ = true;
-		this.mouse$ = {x: null, y: null};
-		
 		element.style.cursor = "move";
-		this.postype$ = window.getComputedStyle(element.parentElement).position;
-
-		if (this.postype$ == "fixed")	this.postype$ = "absolute";
-		if (this.postype$ == "sticky") this.postype$ = "relative";
-
 	}
+
+
+	private init(event:MouseEvent, element:HTMLElement)
+	{
+		this.down$ = Date.now();
+
+		this.mouse$ =
+		{
+			x: event.clientX,
+			y: event.clientY
+		}
+	}
+
+
+	private leave(event:MouseEvent, element:HTMLElement) : void
+	{
+		console.log("leave")
+		this.down$ = null;
+		this.move$ = false;
+		this.element$.style.cursor = this.cursor$;
+
+		this.mouse$ =
+		{
+			x: event.clientX,
+			y: event.clientY
+		}
+
+		let top:string = element.style.top;
+		let left:string = element.style.left;
+
+		top = top.substring(0,top.length-2);
+		left = left.substring(0,left.length-2);
+
+		this.position$ =
+		{
+			y: +top,
+			x: +left
+		}
+}
 
 
 	private move(event:MouseEvent, element:HTMLElement) : void
 	{
-		if (!this.mouse$.x && !this.mouse$.y)
+		if (!this.move$)
 		{
-			this.mouse$.x = event.clientX;
-			this.mouse$.y = event.clientY;
-
 			this.mouse$ =
 			{
 				x: event.clientX,
 				y: event.clientY
 			}
 
-			this.position$ =
-			{
-				y: +element.offsetTop,
-				x: +element.offsetLeft
-			}
+			console.log("position x: "+this.position$.x+" y: "+this.position$.y)
 
-			this.boundary$ =
-			{
-				y: element.parentElement.offsetTop,
-				x: element.parentElement.offsetLeft,
-				w: element.parentElement.offsetWidth,
-				h: element.parentElement.offsetHeight
-			};
-
-			this.adjust(element);
-
-			console.log("mouse (x,y) "+this.mouse$.x+" "+this.mouse$.y)
-			console.log(this.mouse$);
-			console.log("element (x,y) "+element.offsetLeft+" "+element.offsetTop);
 			return;
 		}
+
+		event.preventDefault();
 
 		let offX:number = event.clientX - this.mouse$.x;
 		let offY:number = event.clientY - this.mouse$.y;
 
-		let elemY:number = element.offsetTop;
-		let elemX:number = element.offsetLeft;
+		console.log("delta (x,y) "+offX+" "+offY)
+
 		let elemW:number = element.offsetWidth;
 		let elemH:number = element.offsetHeight;
 
 		let posX:number = this.position$.x + offX;
 		let posY:number = this.position$.y + offY;
 
+		/*
 		let minX:number = this.boundary$.x;
 		let minY:number = this.boundary$.y;
 
@@ -258,14 +259,41 @@ class MouseHandler
 
 		if (posX > maxX) posX = maxX;
 		if (posY > maxY) posY = maxY;
+		*/
 
+		//console.log("move left "+element.offsetLeft+" -> "+posX)
 		element.style.top = posY + "px";
 		element.style.left = posX + "px";
+
+		console.log("after "+element.offsetLeft+" "+element.offsetTop)
+		console.log("after "+element.style.left+" "+element.style.top)
 	}
 
 
 	private adjust(element:HTMLElement) : void
 	{
+		this.position$ =
+		{
+			y: element.offsetTop,
+			x: element.offsetLeft
+		}
+
+		this.boundary$ =
+		{
+			y: element.parentElement.offsetTop,
+			x: element.parentElement.offsetLeft,
+			w: element.parentElement.offsetWidth,
+			h: element.parentElement.offsetHeight
+		};
+
+		this.postype$ = window.getComputedStyle(element.parentElement).position;
+
+		if (this.postype$ == "") this.postype$ = null;
+		if (this.postype$ == "static") this.postype$ = null;
+
+		if (this.postype$ == "fixed")	this.postype$ = "absolute";
+		if (this.postype$ == "sticky") this.postype$ = "relative";
+
 		switch(this.postype$)
 		{
 			case null :
