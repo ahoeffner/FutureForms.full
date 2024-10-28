@@ -130,6 +130,7 @@ class MouseHandler
 	private down$:number = null;
 	private move$:boolean = false;
 	private cursor$:string = null;
+	private postype$:string = null;
 	private element$:HTMLElement = null;
 
 	private mouse$:{x:number, y:number} = null;
@@ -181,6 +182,7 @@ class MouseHandler
 		this.move$ = false;
 
 		this.mouse$ = null;
+		this.postype$ = null;
 		this.position$ = null;
 		this.boundary$ = null;
 
@@ -188,66 +190,20 @@ class MouseHandler
 			return;
 
 		this.move$ = true;
-		this.mouse$ = {x: -1, y: -1};
+		this.mouse$ = {x: null, y: null};
+		
 		element.style.cursor = "move";
+		this.postype$ = window.getComputedStyle(element.parentElement).position;
 
-		this.position$ =
-		{
-			y: +element.offsetTop,
-			x: +element.offsetLeft
-		}
+		if (this.postype$ == "fixed")	this.postype$ = "absolute";
+		if (this.postype$ == "sticky") this.postype$ = "relative";
 
-		this.boundary$ =
-		{
-			y: element.parentElement.offsetTop,
-			x: element.parentElement.offsetLeft,
-			w: element.parentElement.offsetWidth,
-			h: element.parentElement.offsetHeight
-		};
-
-		let type:string = window.getComputedStyle(element.parentElement).position;
-
-		if (type == "static") type = "";
-		if (type == "fixed")	type = "absolute";
-		if (type == "sticky") type = "relative";
-
-		switch(type)
-		{
-			case "" :
-
-				this.boundary$.w += this.boundary$.x;
-				this.boundary$.h += this.boundary$.y;
-
-				this.position$.y -= element.offsetTop;
-				this.position$.x -= element.offsetLeft;
-
-				break;
-
-			case "absolute" :
-
-				this.boundary$.x = 0;
-				this.boundary$.y = 0;
-
-				let parent:HTMLElement = element.parentElement;
-
-				this.boundary$.w = parent.parentElement.clientWidth;
-				this.boundary$.h = parent.parentElement.clientHeight;
-
-				break;
-
-			case "relative" :
-
-				this.boundary$.x = 0;
-				this.boundary$.y = 0;
-
-				break;
-		}
 	}
 
 
 	private move(event:MouseEvent, element:HTMLElement) : void
 	{
-		if (this.mouse$.x < 0)
+		if (!this.mouse$.x && !this.mouse$.y)
 		{
 			this.mouse$.x = event.clientX;
 			this.mouse$.y = event.clientY;
@@ -263,6 +219,16 @@ class MouseHandler
 				y: +element.offsetTop,
 				x: +element.offsetLeft
 			}
+
+			this.boundary$ =
+			{
+				y: element.parentElement.offsetTop,
+				x: element.parentElement.offsetLeft,
+				w: element.parentElement.offsetWidth,
+				h: element.parentElement.offsetHeight
+			};
+
+			this.adjust(element);
 
 			console.log("mouse (x,y) "+this.mouse$.x+" "+this.mouse$.y)
 			console.log(this.mouse$);
@@ -295,5 +261,41 @@ class MouseHandler
 
 		element.style.top = posY + "px";
 		element.style.left = posX + "px";
+	}
+
+
+	private adjust(element:HTMLElement) : void
+	{
+		switch(this.postype$)
+		{
+			case null :
+
+				this.boundary$.w += this.boundary$.x;
+				this.boundary$.h += this.boundary$.y;
+
+				this.position$.y -= element.offsetTop;
+				this.position$.x -= element.offsetLeft;
+
+				break;
+
+			case "absolute" :
+
+				this.boundary$.x = 0;
+				this.boundary$.y = 0;
+
+				let parent:HTMLElement = element.parentElement;
+
+				this.boundary$.w = parent.parentElement.clientWidth;
+				this.boundary$.h = parent.parentElement.clientHeight;
+
+				break;
+
+			case "relative" :
+
+				this.boundary$.x = 0;
+				this.boundary$.y = 0;
+
+				break;
+		}
 	}
 }
