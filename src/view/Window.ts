@@ -247,26 +247,21 @@ class MouseHandler
 		let posX:number = this.position$.x + offX;
 		let posY:number = this.position$.y + offY;
 
-		/*
 		let minX:number = this.boundary$.x;
 		let minY:number = this.boundary$.y;
 
-		let maxX:number = this.boundary$.w + elemW;
-		let maxY:number = this.boundary$.h + elemH;
+		let maxX:number = this.boundary$.w - elemW;
+		let maxY:number = this.boundary$.h - elemH;
 
 		if (posX < minX) posX = minX;
 		if (posY < minY) posY = minY;
 
 		if (posX > maxX) posX = maxX;
 		if (posY > maxY) posY = maxY;
-		*/
 
 		//console.log("move left "+element.offsetLeft+" -> "+posX)
 		element.style.top = posY + "px";
 		element.style.left = posX + "px";
-
-		console.log("after "+element.offsetLeft+" "+element.offsetTop)
-		console.log("after "+element.style.left+" "+element.style.top)
 	}
 
 
