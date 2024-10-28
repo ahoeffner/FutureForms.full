@@ -154,9 +154,6 @@ class MouseHandler
 		if (event.type == "mouseup")
 			this.leave(event,this.element$);
 
-		if (event.type == "mouseout" && event.target == this.element$)
-			this.leave(event,this.element$);
-
 		if (event.type == "mousedown")
 		{
 			this.init(event,this.element$);
@@ -164,7 +161,10 @@ class MouseHandler
 		}
 
 		if (event.type == "mousemove")
-			this.move(event,this.element$);
+		{
+			if (!this.move(event,this.element$))
+				this.leave(event,this.element$);
+		}
 	}
 
 
@@ -205,22 +205,21 @@ class MouseHandler
 			y: event.clientY
 		}
 
-		let top:string = element.style.top;
-		let left:string = element.style.left;
-
-		top = top.substring(0,top.length-2);
-		left = left.substring(0,left.length-2);
+		let area = this.area(element);
 
 		this.position$ =
 		{
-			y: +top,
-			x: +left
+			y: area.y,
+			x: area.x
 		}
 }
 
 
-	private move(event:MouseEvent, element:HTMLElement) : void
+	private move(event:MouseEvent, element:HTMLElement) : boolean
 	{
+		if (this.left(event,element))
+			return(false);
+
 		if (!this.move$)
 		{
 			this.mouse$ =
@@ -229,8 +228,6 @@ class MouseHandler
 				y: event.clientY
 			}
 
-			console.log("position x: "+this.position$.x+" y: "+this.position$.y)
-
 			return;
 		}
 
@@ -238,8 +235,6 @@ class MouseHandler
 
 		let offX:number = event.clientX - this.mouse$.x;
 		let offY:number = event.clientY - this.mouse$.y;
-
-		console.log("delta (x,y) "+offX+" "+offY)
 
 		let elemW:number = element.offsetWidth;
 		let elemH:number = element.offsetHeight;
@@ -259,9 +254,42 @@ class MouseHandler
 		if (posX > maxX) posX = maxX;
 		if (posY > maxY) posY = maxY;
 
-		//console.log("move left "+element.offsetLeft+" -> "+posX)
 		element.style.top = posY + "px";
 		element.style.left = posX + "px";
+
+		return(true);
+	}
+
+
+	private left(event:MouseEvent, element:HTMLElement) : boolean
+	{
+		let area = this.area(element);
+
+		console.log("mouse "+event.clientX+" "+event.clientY)
+		console.log(area)
+
+		if (event.clientX < area.x || event.clientX > area.x + area.w)
+			return(true);
+
+		if (event.clientY < area.y || event.clientY > area.y + area.h)
+			return(true);
+
+		return(false);
+	}
+
+
+	private area(element:HTMLElement) : {x:number, y:number, w:number, h:number}
+	{
+		let top:string = element.style.top;
+		let left:string = element.style.left;
+
+		top = top.substring(0,top.length-2);
+		left = left.substring(0,left.length-2);
+
+		let width:number = element.offsetWidth;
+		let height:number = element.offsetHeight;
+
+		return({y: +top, x: +left, w: width, h: height})
 	}
 
 
