@@ -251,6 +251,19 @@ class MouseHandler
 		{
 			this.mouse$.x = event.clientX;
 			this.mouse$.y = event.clientY;
+
+			this.mouse$ =
+			{
+				x: event.clientX,
+				y: event.clientY
+			}
+
+			this.position$ =
+			{
+				y: +element.offsetTop,
+				x: +element.offsetLeft
+			}
+
 			console.log("mouse (x,y) "+this.mouse$.x+" "+this.mouse$.y)
 			console.log(this.mouse$);
 			console.log("element (x,y) "+element.offsetLeft+" "+element.offsetTop);
