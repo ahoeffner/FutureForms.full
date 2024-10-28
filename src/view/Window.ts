@@ -24,6 +24,7 @@ import { Components } from "./Components.js";
 import { Window as Parent } from "../public/Window.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
+import { off } from "process";
 
 
 export class Window implements ViewComponent
@@ -130,19 +131,24 @@ class MouseHandler
 	private down$:number = null;
 	private move$:boolean = false;
 	private cursor$:string = null;
-	private postype$:string = null;
 	private element$:HTMLElement = null;
+	private offset$:{x:number, y:number} = null;
+	private container$:{w:number, h:number} = null;
 
-	private mouse$:{x:number, y:number} = null;
-	private position$:{x:number, y:number} = null;
-	private boundary$:{x:number, y:number, w:number, h:number} = null;
 
 
 	public set element(element:HTMLElement)
 	{
-		this.adjust(element);
 		this.element$ = element;
 		this.cursor$ = element.style.cursor;
+
+		let rect:DOMRect = this.element$.getBoundingClientRect();
+
+		this.container$ =
+		{
+			w: rect.width,
+			h: rect.height
+		}
 	}
 
 
@@ -152,18 +158,17 @@ class MouseHandler
 			return;
 
 		if (event.type == "mouseup")
-			this.leave(event,this.element$);
+			this.leave();
 
 		if (event.type == "mousedown")
 		{
-			this.init(event,this.element$);
+			this.init(event);
 			setTimeout(() => {this.check(this.element$)},this.hold);
 		}
 
 		if (event.type == "mousemove")
 		{
-			if (!this.move(event,this.element$))
-				this.leave(event,this.element$);
+			this.move(event);
 		}
 	}
 
@@ -180,173 +185,59 @@ class MouseHandler
 	}
 
 
-	private init(event:MouseEvent, element:HTMLElement)
+	private init(event:MouseEvent)
 	{
+		console.log("init")
 		this.down$ = Date.now();
 
-		this.mouse$ =
+		this.offset$ =
 		{
-			x: event.clientX,
-			y: event.clientY
-		}
-	}
-
-
-	private leave(event:MouseEvent, element:HTMLElement) : void
-	{
-		console.log("leave")
-		this.down$ = null;
-		this.move$ = false;
-		this.element$.style.cursor = this.cursor$;
-
-		this.mouse$ =
-		{
-			x: event.clientX,
-			y: event.clientY
-		}
-
-		let area = this.area(element);
-
-		this.position$ =
-		{
-			y: area.y,
-			x: area.x
+			y: event.clientY - this.element$.offsetTop,
+			x: event.clientX - this.element$.offsetLeft
 		}
 }
 
 
-	private move(event:MouseEvent, element:HTMLElement) : boolean
+	private leave() : void
 	{
-		if (this.left(event,element))
-			return(false);
+		console.log("leave")
+		this.down$ = null;
+		this.move$ = false;
+		this.offset$ = null;
+		this.element$.style.cursor = this.cursor$;
+}
+
+
+	private move(event:MouseEvent) : void
+	{
+		if (!this.offset$)
+			return;
 
 		if (!this.move$)
 		{
-			this.mouse$ =
+			this.offset$ =
 			{
-				x: event.clientX,
-				y: event.clientY
+				y: event.clientY - this.element$.offsetTop,
+				x: event.clientX - this.element$.offsetLeft
 			}
-
-			return;
 		}
-
-		event.preventDefault();
-
-		let offX:number = event.clientX - this.mouse$.x;
-		let offY:number = event.clientY - this.mouse$.y;
-
-		let elemW:number = element.offsetWidth;
-		let elemH:number = element.offsetHeight;
-
-		let posX:number = this.position$.x + offX;
-		let posY:number = this.position$.y + offY;
-
-		let minX:number = this.boundary$.x;
-		let minY:number = this.boundary$.y;
-
-		let maxX:number = this.boundary$.w - elemW;
-		let maxY:number = this.boundary$.h - elemH;
-
-		if (posX < minX) posX = minX;
-		if (posY < minY) posY = minY;
-
-		if (posX > maxX) posX = maxX;
-		if (posY > maxY) posY = maxY;
-
-		element.style.top = posY + "px";
-		element.style.left = posX + "px";
-
-		return(true);
-	}
-
-
-	private left(event:MouseEvent, element:HTMLElement) : boolean
-	{
-		let area = this.area(element);
-
-		console.log("mouse "+event.clientX+" "+event.clientY)
-		console.log(area)
-
-		if (event.clientX < area.x || event.clientX > area.x + area.w)
-			return(true);
-
-		if (event.clientY < area.y || event.clientY > area.y + area.h)
-			return(true);
-
-		return(false);
-	}
-
-
-	private area(element:HTMLElement) : {x:number, y:number, w:number, h:number}
-	{
-		let top:string = element.style.top;
-		let left:string = element.style.left;
-
-		top = top.substring(0,top.length-2);
-		left = left.substring(0,left.length-2);
-
-		let width:number = element.offsetWidth;
-		let height:number = element.offsetHeight;
-
-		return({y: +top, x: +left, w: width, h: height})
-	}
-
-
-	private adjust(element:HTMLElement) : void
-	{
-		this.position$ =
+		else
 		{
-			y: element.offsetTop,
-			x: element.offsetLeft
-		}
+			let top:number = event.clientY - this.offset$.y;
+			let left:number = event.clientX - this.offset$.x;
 
-		this.boundary$ =
-		{
-			y: element.parentElement.offsetTop,
-			x: element.parentElement.offsetLeft,
-			w: element.parentElement.offsetWidth,
-			h: element.parentElement.offsetHeight
-		};
+			console.log("move 1 y: "+top+" x: "+left);
 
-		this.postype$ = window.getComputedStyle(element.parentElement).position;
+			let elemW:number = this.element$.offsetWidth;
+			let elemH:number = this.element$.offsetHeight;
 
-		if (this.postype$ == "") this.postype$ = null;
-		if (this.postype$ == "static") this.postype$ = null;
+			//top = Math.max(0,Math.min(top,this.container$.h - elemH));
+			//left = Math.max(0,Math.min(left,this.container$.w - elemW));
 
-		if (this.postype$ == "fixed")	this.postype$ = "absolute";
-		if (this.postype$ == "sticky") this.postype$ = "relative";
+			this.element$.style.top = top + "px";
+			this.element$.style.left = left + "px";
 
-		switch(this.postype$)
-		{
-			case null :
-
-				this.boundary$.w += this.boundary$.x;
-				this.boundary$.h += this.boundary$.y;
-
-				this.position$.y -= element.offsetTop;
-				this.position$.x -= element.offsetLeft;
-
-				break;
-
-			case "absolute" :
-
-				this.boundary$.x = 0;
-				this.boundary$.y = 0;
-
-				let parent:HTMLElement = element.parentElement;
-
-				this.boundary$.w = parent.parentElement.clientWidth;
-				this.boundary$.h = parent.parentElement.clientHeight;
-
-				break;
-
-			case "relative" :
-
-				this.boundary$.x = 0;
-				this.boundary$.y = 0;
-
-				break;
+			console.log("move 2 y: "+top+" x: "+left);
 		}
 	}
 }
