@@ -96,11 +96,8 @@ export class Window implements ViewComponent
 		this.mhandler.element = this.view$;
 
 		this.view$.addEventListener("mouseout",this);
-		this.view$.addEventListener("mouseover",this);
-
-		window.addEventListener("mouseup",this);
-		window.addEventListener("mousemove",this);
-		window.addEventListener("mousedown",this);
+		this.view$.addEventListener("mousemove",this);
+		this.view$.addEventListener("mousedown",this);
    }
 
 
@@ -126,7 +123,7 @@ export class Window implements ViewComponent
 
 class MouseHandler
 {
-	private hold:number = 300;
+	private hold:number = 500;
 	private down$:number = null;
 	private move$:boolean = false;
 	private cursor$:string = null;
@@ -140,9 +137,29 @@ class MouseHandler
 
 	public set element(element:HTMLElement)
 	{
+		this.setup(element);
 		this.element$ = element;
-		this.cursor$ = element.style.cursor;
+	}
 
+
+	public handleEvent(event:MouseEvent) : void
+	{
+		if (event.type == "mouseup")
+			this.leave();
+
+		if (event.type == "mousemove")
+			this.move(event);
+
+		if (event.type == "mousedown")
+		{
+			this.init(event);
+			setTimeout(() => {this.check(this.element$)},this.hold);
+		}
+	}
+
+
+	private setup(element:HTMLElement) : void
+	{
 		let parent:HTMLElement = element.parentElement;
 
 		let rect:DOMRect = element.getBoundingClientRect();
@@ -190,35 +207,7 @@ class MouseHandler
 					y: element.offsetTop,
 					x: element.offsetLeft
 				}
-			}
-	}
-
-
-	public handleEvent(event:MouseEvent) : void
-	{
-		if (event.type == "mouseup")
-			this.leave();
-
-		if (event.type == "mousemove")
-			this.move(event);
-
-		if (event.type == "mousedown")
-		{
-			this.init(event);
-			setTimeout(() => {this.check(this.element$)},this.hold);
 		}
-	}
-
-
-	private check(element:HTMLElement) : void
-	{
-		this.move$ = false;
-
-		if (!this.down$ || Date.now() - this.down$ < this.hold)
-			return;
-
-		this.move$ = true;
-		element.style.cursor = "move";
 	}
 
 
@@ -241,14 +230,30 @@ class MouseHandler
 	}
 
 
+	private check(element:HTMLElement) : void
+	{
+		console.log("check "+(Date.now() - this.down$)+" "+this.move$)
+		this.move$ = false;
+		this.cursor$ = element.style.cursor;
+
+		if (!this.down$ || Date.now() - this.down$ < this.hold)
+			return;
+
+		this.move$ = true;
+		element.style.cursor = "move";
+		window.addEventListener("mouseup",this);
+	}
+
+
 	private leave() : void
 	{
-		console.log("leave")
 		this.down$ = null;
 		this.move$ = false;
 		this.mouse$ = null;
 		this.element$.style.cursor = this.cursor$;
-}
+		window.removeEventListener("mouseup",this);
+		console.log("left "+this.down$)
+	}
 
 
 	private move(event:MouseEvent) : void
@@ -283,9 +288,6 @@ class MouseHandler
 
 			this.element$.style.top = y1 + "px";
 			this.element$.style.left = x1 + "px";
-
-			console.log(this.container$.x1+" "+x1)
-			//console.log(this.container$.x1+" "+x1+" "+this.container$.x2)
 		}
 	}
 }
