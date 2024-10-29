@@ -24,7 +24,6 @@ import { Components } from "./Components.js";
 import { Window as Parent } from "../public/Window.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
-import { off } from "process";
 
 
 export class Window implements ViewComponent
@@ -99,9 +98,9 @@ export class Window implements ViewComponent
 		this.view$.addEventListener("mouseout",this);
 		this.view$.addEventListener("mouseover",this);
 
-		this.view$.addEventListener("mouseup",this);
-		this.view$.addEventListener("mousemove",this);
-		this.view$.addEventListener("mousedown",this);
+		window.addEventListener("mouseup",this);
+		window.addEventListener("mousemove",this);
+		window.addEventListener("mousedown",this);
    }
 
 
@@ -135,7 +134,7 @@ class MouseHandler
 	private mouse$:{x:number, y:number} = null;
 	private position$:{x:number, y:number} = null;
 	private compensate$:{x:number, y:number} = null;
-	private container$:{x:number, y:number, w:number, h:number} = null;
+	private container$:{x1:number, y1:number, x2:number, y2:number} = null;
 
 
 
@@ -144,61 +143,69 @@ class MouseHandler
 		this.element$ = element;
 		this.cursor$ = element.style.cursor;
 
+		let parent:HTMLElement = element.parentElement;
+
 		let rect:DOMRect = element.getBoundingClientRect();
-		let post:string = window.getComputedStyle(element).position;
+		let prect:DOMRect = parent.getBoundingClientRect();
+		let postp:string = window.getComputedStyle(element).position;
 
-		this.container$ =
+		let margin =
 		{
-			y: rect.x,
-			x: rect.y,
-			w: rect.width,
-			h: rect.height
+			y: element.clientTop,
+			x: element.clientLeft
 		}
 
-		if (post == "relative")
+		switch(postp)
 		{
-			this.compensate$ =
-			{
-				y: element.offsetTop,
-				x: element.offsetLeft
-			}
-		}
+			case "fixed":
 
-		if (post == "absolute")
-		{
-			this.compensate$ =
-			{
-				y: element.offsetTop,
-				x: element.offsetLeft
-			}
-			this.compensate$ =
-			{
-				y: 0,
-				x: 50
-			}
-		}
+			case "absolute":
+				this.container$ =
+				{
+					x1: prect.x - rect.x,
+					y1: prect.y - rect.y,
+					x2: prect.width - rect.x + prect.x,
+					y2: prect.height - rect.y + prect.y
+				}
 
-		console.log(this.compensate$)
+				this.compensate$ =
+				{
+					y: rect.y - prect.y - margin.y - window.scrollY,
+					x: rect.x - prect.x - margin.x - window.scrollX
+				}
+
+				break;
+
+			default:
+				this.container$ =
+				{
+					y1: -element.offsetTop,
+					x1: -element.offsetLeft,
+					x2: prect.width + prect.x - rect.x,
+					y2: prect.height + prect.y - rect.y
+				}
+
+				this.compensate$ =
+				{
+					y: element.offsetTop,
+					x: element.offsetLeft
+				}
+			}
 	}
 
 
 	public handleEvent(event:MouseEvent) : void
 	{
-		if (event.type.indexOf("mouse") < 0)
-			return;
-
 		if (event.type == "mouseup")
 			this.leave();
+
+		if (event.type == "mousemove")
+			this.move(event);
 
 		if (event.type == "mousedown")
 		{
 			this.init(event);
 			setTimeout(() => {this.check(this.element$)},this.hold);
-		}
-
-		if (event.type == "mousemove")
-		{
-			this.move(event);
 		}
 	}
 
@@ -262,18 +269,23 @@ class MouseHandler
 			let dy:number = event.clientY - this.mouse$.y;
 			let dx:number = event.clientX - this.mouse$.x;
 
-			let top:number = this.position$.y + dy - this.compensate$.y;
-			let left:number = this.position$.x + dx - this.compensate$.x;
+			let x1:number = this.position$.x + dx - this.compensate$.x;
+			let y1:number = this.position$.y + dy - this.compensate$.y;
 
-			//let elemW:number = this.element$.offsetWidth;
-			//let elemH:number = this.element$.offsetHeight;
+			let x2:number = x1 + this.element$.offsetWidth;
+			let y2:number = y1 + this.element$.offsetHeight;
 
-			//top = Math.max(0,Math.min(top,this.container$.h - elemH));
-			//left = Math.max(0,Math.min(left,this.container$.w - elemW));
+			if (x1 < this.container$.x1) x1 = this.container$.x1;
+			if (y1 < this.container$.y1) y1 = this.container$.y1;
 
+			if (x2 > this.container$.x2) x1 = this.container$.x2 - this.element$.offsetWidth;
+			if (y2 > this.container$.y2) y1 = this.container$.y2 - this.element$.offsetHeight;
 
-			this.element$.style.top = top + "px";
-			this.element$.style.left = left + "px";
+			this.element$.style.top = y1 + "px";
+			this.element$.style.left = x1 + "px";
+
+			console.log(this.container$.x1+" "+x1)
+			//console.log(this.container$.x1+" "+x1+" "+this.container$.x2)
 		}
 	}
 }
