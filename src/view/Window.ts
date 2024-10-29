@@ -123,7 +123,7 @@ export class Window implements ViewComponent
 
 class MouseHandler
 {
-	private hold:number = 500;
+	private hold:number = 300;
 	private down$:number = null;
 	private move$:boolean = false;
 	private cursor$:string = null;
@@ -213,8 +213,8 @@ class MouseHandler
 
 	private init(event:MouseEvent)
 	{
-		console.log("init")
 		this.down$ = Date.now();
+		window.addEventListener("mouseup",this);
 
 		this.mouse$ =
 		{
@@ -232,7 +232,6 @@ class MouseHandler
 
 	private check(element:HTMLElement) : void
 	{
-		console.log("check "+(Date.now() - this.down$)+" "+this.move$)
 		this.move$ = false;
 		this.cursor$ = element.style.cursor;
 
@@ -241,7 +240,6 @@ class MouseHandler
 
 		this.move$ = true;
 		element.style.cursor = "move";
-		window.addEventListener("mouseup",this);
 	}
 
 
@@ -252,7 +250,6 @@ class MouseHandler
 		this.mouse$ = null;
 		this.element$.style.cursor = this.cursor$;
 		window.removeEventListener("mouseup",this);
-		console.log("left "+this.down$)
 	}
 
 
