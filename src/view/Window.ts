@@ -152,8 +152,8 @@ class MouseHandler
 
 		if (event.type == "mousedown")
 		{
-			this.init(event);
-			setTimeout(() => {this.check(this.element$)},this.hold);
+			if (this.init(event))
+				setTimeout(() => {this.check(this.element$)},this.hold);
 		}
 	}
 
@@ -211,8 +211,16 @@ class MouseHandler
 	}
 
 
-	private init(event:MouseEvent)
+	private init(event:MouseEvent) : boolean
 	{
+		let rect:DOMRect = this.element$.getBoundingClientRect();
+
+		let y:number = event.clientY - rect.top;
+		let x:number = event.clientX - rect.left;
+
+		if (x > rect.width - 15 && y > rect.height - 15)
+			return(false);
+
 		this.down$ = Date.now();
 		window.addEventListener("mouseup",this);
 
@@ -227,6 +235,8 @@ class MouseHandler
 			y: this.element$.offsetTop,
 			x: this.element$.offsetLeft
 		}
+
+		return(true);
 	}
 
 
