@@ -147,11 +147,14 @@ class MouseHandler
 		if (event.type == "mouseup")
 			this.leave();
 
-		if (event.type == "mouseout")
-			this.leave();
-
 		if (event.type == "mousemove")
 			this.move(event);
+
+		if (event.type == "mouseout")
+		{
+			if (event.target == document.body)
+				this.leave();
+		}
 
 		if (event.type == "mousedown")
 		{
@@ -227,7 +230,7 @@ class MouseHandler
 		this.down$ = Date.now();
 
 		window.addEventListener("mouseup",this);
-		window.addEventListener("mouseuout",this);
+		window.addEventListener("mouseout",this);
 
 		this.mouse$ =
 		{
@@ -266,7 +269,7 @@ class MouseHandler
 		this.element$.style.cursor = this.cursor$;
 
 		window.removeEventListener("mouseup",this);
-		window.removeEventListener("mouseuot",this);
+		window.removeEventListener("mouseout",this);
 	}
 
 
