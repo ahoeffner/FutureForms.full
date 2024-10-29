@@ -132,8 +132,10 @@ class MouseHandler
 	private move$:boolean = false;
 	private cursor$:string = null;
 	private element$:HTMLElement = null;
-	private offset$:{x:number, y:number} = null;
-	private container$:{w:number, h:number} = null;
+	private mouse$:{x:number, y:number} = null;
+	private position$:{x:number, y:number} = null;
+	private compensate$:{x:number, y:number} = null;
+	private container$:{x:number, y:number, w:number, h:number} = null;
 
 
 
@@ -142,13 +144,41 @@ class MouseHandler
 		this.element$ = element;
 		this.cursor$ = element.style.cursor;
 
-		let rect:DOMRect = this.element$.getBoundingClientRect();
+		let rect:DOMRect = element.getBoundingClientRect();
+		let post:string = window.getComputedStyle(element).position;
 
 		this.container$ =
 		{
+			y: rect.x,
+			x: rect.y,
 			w: rect.width,
 			h: rect.height
 		}
+
+		if (post == "relative")
+		{
+			this.compensate$ =
+			{
+				y: element.offsetTop,
+				x: element.offsetLeft
+			}
+		}
+
+		if (post == "absolute")
+		{
+			this.compensate$ =
+			{
+				y: element.offsetTop,
+				x: element.offsetLeft
+			}
+			this.compensate$ =
+			{
+				y: 0,
+				x: 50
+			}
+		}
+
+		console.log(this.compensate$)
 	}
 
 
@@ -190,12 +220,18 @@ class MouseHandler
 		console.log("init")
 		this.down$ = Date.now();
 
-		this.offset$ =
+		this.mouse$ =
 		{
-			y: event.clientY - this.element$.offsetTop,
-			x: event.clientX - this.element$.offsetLeft
+			y: event.clientY,
+			x: event.clientX
 		}
-}
+
+		this.position$ =
+		{
+			y: this.element$.offsetTop,
+			x: this.element$.offsetLeft
+		}
+	}
 
 
 	private leave() : void
@@ -203,41 +239,41 @@ class MouseHandler
 		console.log("leave")
 		this.down$ = null;
 		this.move$ = false;
-		this.offset$ = null;
+		this.mouse$ = null;
 		this.element$.style.cursor = this.cursor$;
 }
 
 
 	private move(event:MouseEvent) : void
 	{
-		if (!this.offset$)
+		if (!this.mouse$)
 			return;
 
 		if (!this.move$)
 		{
-			this.offset$ =
+			this.mouse$ =
 			{
-				y: event.clientY - this.element$.offsetTop,
-				x: event.clientX - this.element$.offsetLeft
+				y: event.clientY,
+				x: event.clientX
 			}
 		}
 		else
 		{
-			let top:number = event.clientY - this.offset$.y;
-			let left:number = event.clientX - this.offset$.x;
+			let dy:number = event.clientY - this.mouse$.y;
+			let dx:number = event.clientX - this.mouse$.x;
 
-			console.log("move 1 y: "+top+" x: "+left);
+			let top:number = this.position$.y + dy - this.compensate$.y;
+			let left:number = this.position$.x + dx - this.compensate$.x;
 
-			let elemW:number = this.element$.offsetWidth;
-			let elemH:number = this.element$.offsetHeight;
+			//let elemW:number = this.element$.offsetWidth;
+			//let elemH:number = this.element$.offsetHeight;
 
 			//top = Math.max(0,Math.min(top,this.container$.h - elemH));
 			//left = Math.max(0,Math.min(left,this.container$.w - elemW));
 
+
 			this.element$.style.top = top + "px";
 			this.element$.style.left = left + "px";
-
-			console.log("move 2 y: "+top+" x: "+left);
 		}
 	}
 }
