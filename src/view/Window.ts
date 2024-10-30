@@ -117,8 +117,17 @@ export class Window implements ViewComponent
 
 	public handleEvent(event:Event) : void
 	{
-		if (event instanceof MouseEvent)
-			return(this.mhandler.handleEvent(event));
+		if (!this.focus$ && event.type == "focus")
+		{
+			this.focus$ = true;
+			console.log("focus");
+		}
+
+		if (!this.focus$ && event.type == "mousedown")
+		{
+			this.focus$ = true;
+			console.log("focus");
+		}
 
 		if (event instanceof CustomEvent)
 		{
@@ -133,7 +142,10 @@ export class Window implements ViewComponent
 				this.focus$ = false;
 				console.log("blur");
 			}
-			}
+		}
+
+		if (event instanceof MouseEvent)
+			return(this.mhandler.handleEvent(event));
 	}
 }
 
