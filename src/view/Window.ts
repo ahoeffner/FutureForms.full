@@ -31,6 +31,7 @@ export class Window implements ViewComponent
 {
 	private comps$:any[] = [];
 	private window$:Parent = null;
+	private focus$:boolean = false;
 	private view$:HTMLElement = null;
 	private parent$:ViewComponent = null;
 	private mhandler:MouseHandler = new MouseHandler();
@@ -121,8 +122,18 @@ export class Window implements ViewComponent
 
 		if (event instanceof CustomEvent)
 		{
-			console.log("custom")
-		}
+			if (event.type == "focus" && !this.focus$)
+			{
+				this.focus$ = true;
+				console.log("focus");
+			}
+
+			if (event.type == "blur")
+			{
+				this.focus$ = false;
+				console.log("blur");
+			}
+			}
 	}
 }
 

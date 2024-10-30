@@ -102,6 +102,5 @@ export class Form implements ViewComponent
 
 	public handleEvent(event:Event) : void
 	{
-		console.log("Form: "+event.type+" custom: "+(event instanceof CustomEvent))
 	}
 }

@@ -48,6 +48,7 @@ export class EventHandler implements EventListenerObject
       'F12'
    ];
 
+	private static last$:ViewComponent = null;
 	private static current$:ViewComponent = null;
 
 
@@ -58,14 +59,23 @@ export class EventHandler implements EventListenerObject
    {
       let handler:EventHandler = new EventHandler();
 
-		document.body.addEventListener("click",handler);
-		document.body.addEventListener("input",handler);
-		document.body.addEventListener("keydown",handler);
-		document.body.addEventListener("focusin",handler);
+		document.addEventListener("click",handler);
+		document.addEventListener("input",handler);
+		document.addEventListener("keydown",handler);
+		document.addEventListener("focusin",handler);
    }
 
 
    private constructor() {};
+
+
+	/**
+	 * The current focused ViewComponent
+	 */
+	public static get current() : ViewComponent
+	{
+		return(EventHandler.current$);
+	}
 
 
    /**
@@ -80,16 +90,18 @@ export class EventHandler implements EventListenerObject
 
 			if (event.type == "focusin" || event.type == "click")
 			{
-				if (comp != EventHandler.current$)
+				EventHandler.current$ = comp;
+
+				if (comp != EventHandler.last$)
 				{
 					let detail:any = null;
 					let cevent:CustomEvent = null;
 
-					if (EventHandler.current$)
+					if (EventHandler.last$)
 					{
-						detail = {targetElement: EventHandler.current$.getView()};
+						detail = {targetElement: EventHandler.last$.getView()};
 						cevent = new CustomEvent("blur",{detail: detail});
-						this.bubble(EventHandler.current$,cevent);
+						this.bubble(EventHandler.last$,cevent);
 					}
 
 					if (comp)
@@ -99,7 +111,7 @@ export class EventHandler implements EventListenerObject
 						this.bubble(comp,cevent);
 					}
 
-					EventHandler.current$ = comp;
+					EventHandler.last$ = comp;
 				}
 			}
 
