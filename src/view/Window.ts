@@ -159,7 +159,7 @@ class MouseHandler
 		if (event.type == "mousedown")
 		{
 			if (this.init(event))
-				setTimeout(() => {this.check(this.element$)},this.hold);
+				setTimeout(() => {this.check()},this.hold);
 		}
 	}
 
@@ -251,13 +251,10 @@ class MouseHandler
 	}
 
 
-	private check(element:HTMLElement) : void
+	private check() : void
 	{
 		this.move$ = false;
 		this.cursor$ = this.element$.style.cursor;
-
-		if (!this.isWindowHandle(element))
-			return;
 
 		if (!this.down$ || Date.now() - this.down$ < this.hold)
 			return;
@@ -319,7 +316,6 @@ class MouseHandler
 	{
 		if (element instanceof HTMLElement)
 		{
-			console.log(element)
 			let hdl:string = element.getAttribute("windowhandle");
 			return(hdl?.toLowerCase() == "true" || element == this.element$);
 		}
