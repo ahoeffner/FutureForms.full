@@ -21,6 +21,7 @@
 
 import { Parser } from "./Parser.js";
 import { Components } from "./Components.js";
+import { Properties } from "../public/Properties.js";
 import { Window as Parent } from "../public/Window.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
@@ -116,7 +117,12 @@ export class Window implements ViewComponent
 	public handleEvent(event:Event) : void
 	{
 		if (event instanceof MouseEvent)
-			this.mhandler.handleEvent(event);
+			return(this.mhandler.handleEvent(event));
+
+		if (event instanceof CustomEvent)
+		{
+			console.log("custom")
+		}
 	}
 }
 
@@ -128,12 +134,16 @@ class MouseHandler
 	private move$:boolean = false;
 	private cursor$:string = null;
 	private element$:HTMLElement = null;
+	private windowhandle$:string = null;
 	private mouse$:{x:number, y:number} = null;
 	private position$:{x:number, y:number} = null;
 	private compensate$:{x:number, y:number} = null;
 	private container$:{x1:number, y1:number, x2:number, y2:number} = null;
 
-
+	constructor()
+	{
+		this.windowhandle$ = Properties.attributes.windowhandle;
+	}
 
 	public set element(element:HTMLElement)
 	{
@@ -316,7 +326,7 @@ class MouseHandler
 	{
 		if (element instanceof HTMLElement)
 		{
-			let hdl:string = element.getAttribute("windowhandle");
+			let hdl:string = element.getAttribute(this.windowhandle$);
 			return(hdl?.toLowerCase() == "true" || element == this.element$);
 		}
 

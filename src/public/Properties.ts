@@ -19,7 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-export class Tags
+class Tags
 {
 	public from:string = "from";
 	public foreach:string = "foreach";
@@ -27,7 +27,14 @@ export class Tags
 }
 
 
+class Attributes
+{
+	public windowhandle:string = "windowhandle";
+}
+
+
 export class Properties
 {
 	public static tags:Tags = new Tags();
+	public static attributes:Attributes = new Attributes();
 }
