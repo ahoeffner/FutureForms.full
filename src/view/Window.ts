@@ -219,6 +219,9 @@ class MouseHandler
 
 	private init(event:MouseEvent) : boolean
 	{
+		if (!this.isWindowHandle(event.target as HTMLElement))
+				return(false);
+
 		let rect:DOMRect = this.element$.getBoundingClientRect();
 
 		let y:number = event.clientY - rect.top;
@@ -229,8 +232,8 @@ class MouseHandler
 
 		this.down$ = Date.now();
 
-		window.addEventListener("mouseup",this);
-		window.addEventListener("mouseout",this);
+		document.addEventListener("mouseup",this,true);
+		document.addEventListener("mouseout",this,true);
 
 		this.mouse$ =
 		{
@@ -251,13 +254,16 @@ class MouseHandler
 	private check(element:HTMLElement) : void
 	{
 		this.move$ = false;
-		this.cursor$ = element.style.cursor;
+		this.cursor$ = this.element$.style.cursor;
+
+		if (!this.isWindowHandle(element))
+			return;
 
 		if (!this.down$ || Date.now() - this.down$ < this.hold)
 			return;
 
 		this.move$ = true;
-		element.style.cursor = "move";
+		this.element$.style.cursor = "move";
 	}
 
 
@@ -268,8 +274,8 @@ class MouseHandler
 		this.mouse$ = null;
 		this.element$.style.cursor = this.cursor$;
 
-		window.removeEventListener("mouseup",this);
-		window.removeEventListener("mouseout",this);
+		document.removeEventListener("mouseup",this);
+		document.removeEventListener("mouseout",this);
 	}
 
 
@@ -306,5 +312,18 @@ class MouseHandler
 			this.element$.style.top = y1 + "px";
 			this.element$.style.left = x1 + "px";
 		}
+	}
+
+
+	private isWindowHandle(element:HTMLElement) : boolean
+	{
+		if (element instanceof HTMLElement)
+		{
+			console.log(element)
+			let hdl:string = element.getAttribute("windowhandle");
+			return(hdl?.toLowerCase() == "true" || element == this.element$);
+		}
+
+		return(false);
 	}
 }
