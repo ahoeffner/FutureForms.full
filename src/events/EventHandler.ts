@@ -55,7 +55,7 @@ export class EventHandler implements EventListenerObject
    /**
     * Add the necessary events
     */
-   public static initialize() : void
+   static
    {
       let handler:EventHandler = new EventHandler();
 
@@ -66,7 +66,15 @@ export class EventHandler implements EventListenerObject
    }
 
 
-   private constructor() {};
+	/**
+	 * Ensure static constructor
+	 */
+	public static initialize() : void
+	{
+	}
+
+
+	private constructor() {};
 
 
 	/**
@@ -75,6 +83,12 @@ export class EventHandler implements EventListenerObject
 	public static get current() : ViewComponent
 	{
 		return(EventHandler.current$);
+	}
+
+
+	public static async sendCustomEvent(event:CustomEvent) : Promise<void>
+	{
+		// Send event to all listeners
 	}
 
 
