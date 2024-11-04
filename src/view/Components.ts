@@ -24,6 +24,9 @@ import { isViewComponent, ViewComponent } from "../public/ViewComponent.js";
 
 export class Components
 {
+	private static binds$:Map<ViewComponent,any> =
+		new Map<ViewComponent,any>();
+
 	private static comps$:Map<any,ViewComponent> =
 		new Map<any,ViewComponent>();
 
@@ -31,15 +34,37 @@ export class Components
    	new Map<HTMLElement,ViewComponent>();
 
 
+	public static add(view:ViewComponent) : void
+	{
+		let element:HTMLElement = view?.getView();
+		if (element) Components.views$.set(element,view);
+	}
+
+
 	public static bind(comp:any, view:ViewComponent) : void
 	{
 		this.comps$.set(comp,view);
+		this.binds$.set(view,comp);
+	}
+
+
+	public static remove(view:ViewComponent) : void
+	{
+		let element:HTMLElement = view?.getView();
+		if (element) Components.views$.delete(element);
 	}
 
 
 	public static release(comp:any) : void
 	{
 		this.comps$.delete(comp);
+	}
+
+
+	public static getComponent(vcomp:ViewComponent) : any
+	{
+		let comp:any = this.binds$.get(vcomp);
+		return(comp ? comp : vcomp);
 	}
 
 
@@ -52,21 +77,7 @@ export class Components
 	}
 
 
-	public static add(view:ViewComponent) : void
-	{
-		let element:HTMLElement = view?.getView();
-		if (element) Components.views$.set(element,view);
-	}
-
-
-	public static remove(view:ViewComponent) : void
-	{
-		let element:HTMLElement = view?.getView();
-		if (element) Components.views$.delete(element);
-	}
-
-
-	public static getComponent(element:HTMLElement) : ViewComponent
+	public static findViewComponent(element:HTMLElement) : ViewComponent
 	{
 		let comp:ViewComponent = null;
 
@@ -82,7 +93,7 @@ export class Components
 	}
 
 
-	public static getComponents() : ViewComponent[]
+	public static getViewComponents() : ViewComponent[]
 	{
 		let comps:ViewComponent[] = [];
 		Components.views$.forEach((comp) => comps.push(comp));

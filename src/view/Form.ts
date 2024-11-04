@@ -25,6 +25,7 @@ import { Form as Parent } from "../public/Form.js";
 import { Form as ModelForm } from "../model/Form.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
+import { EventHandler } from "../events/EventHandler.js";
 
 
 /**
@@ -43,6 +44,7 @@ export class Form implements ViewComponent
    constructor(form:Parent)
    {
 		this.form$ = form;
+		EventHandler.register(this);
 		Components.bind(this.form$,this);
    }
 

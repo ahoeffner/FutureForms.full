@@ -32,12 +32,13 @@ export interface ViewComponent extends EventListenerObject
 
 export function isViewComponent(object:any) : object is ViewComponent
 {
-	return
-	(
-		object.parent != undefined &&
-		object.pause === "function" &&
-		object.resume === "function" &&
-		object.getView === "function" &&
-		object.setView === "function"
-	);
+	let test:boolean = true;
+	if (object.parent === undefined) test = false;
+
+	if (object.pause !== "function") test = false;
+	if (object.resume !== "function") test = false;
+	if (object.getView !== "function") test = false;
+	if (object.setView !== "function") test = false;
+
+	return(test)
 }

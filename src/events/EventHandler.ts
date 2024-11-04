@@ -48,8 +48,9 @@ export class EventHandler implements EventListenerObject
       'F12'
    ];
 
+	private static curr$:any = null;
 	private static last$:ViewComponent = null;
-	private static current$:ViewComponent = null;
+	private static producers$:Map<any,EventListenerObject[]> = new Map<any,EventListenerObject[]>();
 
 
    /**
@@ -80,15 +81,35 @@ export class EventHandler implements EventListenerObject
 	/**
 	 * The current focused ViewComponent
 	 */
-	public static get current() : ViewComponent
+	public static get current() : any
 	{
-		return(EventHandler.current$);
+		return(EventHandler.curr$);
 	}
 
 
-	public static async sendCustomEvent(event:CustomEvent) : Promise<void>
+	public static async register(comp:any) : Promise<void>
 	{
-		// Send event to all listeners
+		this.producers$.set(comp,[]);
+	}
+
+
+	public static async addEventListener(comp:EventListenerObject, target:any) : Promise<void>
+	{
+		target = Components.getViewComponent(target);
+		let lsnrs:EventListenerObject[] = this.producers$.get(target);
+		if (lsnrs) lsnrs.push(comp);
+	}
+
+
+	public static async sendCustomEvent(comp:any, event:CustomEvent) : Promise<void>
+	{
+		let lsnrs:EventListenerObject[] = this.producers$.get(comp);
+		event.detail.targetComponent = Components.getComponent(comp);
+
+		for (let i = 0; lsnrs && i < lsnrs.length; i++)
+		{
+			lsnrs[i].handleEvent(event);
+		}
 	}
 
 
@@ -100,11 +121,11 @@ export class EventHandler implements EventListenerObject
    {
 		if (event.target instanceof HTMLElement)
 		{
-			let comp:ViewComponent = Components.getComponent(event.target);
+			let comp:ViewComponent = Components.findViewComponent(event.target);
 
 			if (event.type == "focusin" || event.type == "click")
 			{
-				EventHandler.current$ = comp;
+				EventHandler.curr$ = Components.getComponent(comp);
 
 				if (comp != EventHandler.last$)
 				{
@@ -115,14 +136,14 @@ export class EventHandler implements EventListenerObject
 					{
 						detail = {targetElement: EventHandler.last$.getView()};
 						cevent = new CustomEvent("blur",{detail: detail});
-						this.bubble(EventHandler.last$,cevent);
+						EventHandler.sendCustomEvent(EventHandler.last$,cevent);
 					}
 
 					if (comp)
 					{
 						detail = {targetElement: comp.getView()};
 						cevent = new CustomEvent("focus",{detail: detail});
-						this.bubble(comp,cevent);
+						EventHandler.sendCustomEvent(comp,cevent);
 					}
 
 					EventHandler.last$ = comp;
@@ -138,14 +159,4 @@ export class EventHandler implements EventListenerObject
 			}
 		}
    }
-
-
-	private bubble(comp:ViewComponent, event:Event) : void
-	{
-		while(comp)
-		{
-			comp.handleEvent(event);
-			comp = comp?.parent;
-		}
-	}
 }

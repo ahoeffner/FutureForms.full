@@ -23,6 +23,7 @@ import { Parser } from "./Parser.js";
 import { Components } from "./Components.js";
 import { Properties } from "../public/Properties.js";
 import { Window as Parent } from "../public/Window.js";
+import { EventHandler } from "../events/EventHandler.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 
@@ -88,6 +89,7 @@ export class Window implements ViewComponent
 
 		this.comps$.forEach((comp) =>
 		{
+			EventHandler.addEventListener(this,comp);
 			comp = Components.getViewComponent(comp);
 			if (comp) comp.parent = this;
 		})
@@ -131,16 +133,10 @@ export class Window implements ViewComponent
 
 		if (event instanceof CustomEvent)
 		{
-			if (event.type == "focus" && !this.focus$)
-			{
-				this.focus$ = true;
-				console.log("focus");
-			}
-
 			if (event.type == "blur")
 			{
-				this.focus$ = false;
-				console.log("blur");
+				let comp:any = event.detail.targetComponent;
+				console.log(EventHandler.current)
 			}
 		}
 
