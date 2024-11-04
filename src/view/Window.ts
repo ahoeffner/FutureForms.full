@@ -135,8 +135,9 @@ export class Window implements ViewComponent
 		{
 			if (event.type == "blur")
 			{
-				let comp:any = event.detail.targetComponent;
-				console.log(EventHandler.current)
+				let comp:any = event.detail.component;
+				if (comp != this.window$ && !this.comps$.includes(comp))
+					console.log("Window blur")
 			}
 		}
 

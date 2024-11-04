@@ -103,8 +103,8 @@ export class EventHandler implements EventListenerObject
 
 	public static async sendCustomEvent(comp:any, event:CustomEvent) : Promise<void>
 	{
+		event.detail.component = Components.getComponent(comp);
 		let lsnrs:EventListenerObject[] = this.producers$.get(comp);
-		event.detail.targetComponent = Components.getComponent(comp);
 
 		for (let i = 0; lsnrs && i < lsnrs.length; i++)
 		{
@@ -134,15 +134,15 @@ export class EventHandler implements EventListenerObject
 
 					if (EventHandler.last$)
 					{
-						detail = {targetElement: EventHandler.last$.getView()};
-						cevent = new CustomEvent("blur",{detail: detail});
+						detail = {target: EventHandler.last$.getView()};
+						cevent = new CustomEvent("blur",{bubbles: true, detail: detail});
 						EventHandler.sendCustomEvent(EventHandler.last$,cevent);
 					}
 
 					if (comp)
 					{
-						detail = {targetElement: comp.getView()};
-						cevent = new CustomEvent("focus",{detail: detail});
+						detail = {target: comp.getView()};
+						cevent = new CustomEvent("focus",{bubbles: true, detail: detail});
 						EventHandler.sendCustomEvent(comp,cevent);
 					}
 
