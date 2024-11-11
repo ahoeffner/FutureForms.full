@@ -81,20 +81,29 @@ export class BusinessEvents implements EventListenerObject
 
 
 	/**
-	 * The current focused ViewComponent
+	 * The current focused Component
 	 */
 	public static get current() : any
 	{
-		return(BusinessEvents.curr$);
+		return(BusinessEvents.curr$.comp);
 	}
 
 
+	/**
+	 * Register a component as producer of business events
+	 * @param comp
+	 */
 	public static async register(comp:any) : Promise<void>
 	{
 		this.producers$.set(comp,[]);
 	}
 
 
+	/**
+	 * Add a listener to a business event producer
+	 * @param comp The class to receive events
+	 * @param target The producer of business events
+	 */
 	public static async addListener(comp:BusinessEventListener, target:any) : Promise<void>
 	{
 		target = Components.getViewComponent(target);
@@ -103,6 +112,10 @@ export class BusinessEvents implements EventListenerObject
 	}
 
 
+	/**
+	 * Send a business event
+	 * @param event
+	 */
 	public static async send(event:BusinessEvent) : Promise<void>
 	{
 		let target:ViewComponent = Components.getViewComponent(event.component);
@@ -122,7 +135,6 @@ export class BusinessEvents implements EventListenerObject
 
    /**
     * @param event The event to be handles
-    * @returns
     */
    public handleEvent(event:Event) : void
    {
