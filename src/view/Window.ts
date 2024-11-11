@@ -23,9 +23,10 @@ import { Parser } from "./Parser.js";
 import { Components } from "./Components.js";
 import { Properties } from "../public/Properties.js";
 import { Window as Parent } from "../public/Window.js";
-import { EventHandler } from "../events/EventHandler.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
+import { BusinessEvent } from "../events/BusinessEvent.js";
+import { BusinessEvents } from "../events/BusinessEvents.js";
 
 
 export class Window implements ViewComponent
@@ -89,7 +90,7 @@ export class Window implements ViewComponent
 
 		this.comps$.forEach((comp) =>
 		{
-			EventHandler.addEventListener(this,comp);
+			BusinessEvents.addListener(this,comp);
 			comp = Components.getViewComponent(comp);
 			if (comp) comp.parent = this;
 		})
@@ -119,30 +120,34 @@ export class Window implements ViewComponent
 
 	public handleEvent(event:Event) : void
 	{
-		if (!this.focus$ && event.type == "focus")
-		{
-			this.focus$ = true;
-			console.log("focus");
-		}
-
 		if (!this.focus$ && event.type == "mousedown")
 		{
-			this.focus$ = true;
-			console.log("focus");
-		}
-
-		if (event instanceof CustomEvent)
-		{
-			if (event.type == "blur")
-			{
-				let comp:any = event.detail.component;
-				if (comp != this.window$ && !this.comps$.includes(comp))
-					console.log("Window blur")
-			}
+			//this.focus$ = true;
+			//console.log("focus");
 		}
 
 		if (event instanceof MouseEvent)
 			return(this.mhandler.handleEvent(event));
+	}
+
+
+	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
+	{
+		if (event.type == "blur")
+		{
+			let comp:any = event.component;
+			console.log("Window received blur")
+
+			if (comp != this.window$ && !this.comps$.includes(comp))
+				console.log("Window blur")
+		}
+		else
+		{
+			if (!this.focus$ && event.type == "focus")
+				console.log("Window focus")
+		}
+
+		return(true);
 	}
 }
 

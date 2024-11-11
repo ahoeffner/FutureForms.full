@@ -25,7 +25,8 @@ import { Form as Parent } from "../public/Form.js";
 import { Form as ModelForm } from "../model/Form.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
-import { EventHandler } from "../events/EventHandler.js";
+import { BusinessEvent } from "../events/BusinessEvent.js";
+import { BusinessEvents } from "../events/BusinessEvents.js";
 
 
 /**
@@ -44,7 +45,7 @@ export class Form implements ViewComponent
    constructor(form:Parent)
    {
 		this.form$ = form;
-		EventHandler.register(this);
+		BusinessEvents.register(this);
 		Components.bind(this.form$,this);
    }
 
@@ -102,7 +103,9 @@ export class Form implements ViewComponent
    }
 
 
-	public handleEvent(event:Event) : void
+	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
+		console.log("form",event)
+		return(true);
 	}
 }

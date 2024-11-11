@@ -19,29 +19,40 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { BusinessEventListener } from "../events/BusinessEventListener.js";
-
-
-export interface ViewComponent extends BusinessEventListener
+export class BusinessEvent extends Event
 {
-	parent:ViewComponent;
-
-	pause() : void;
-	resume() : void;
-	getView() : HTMLElement;
-	setView(view:HTMLElement) : Promise<void>
-}
+	private component$:any = null;
+	private element$:HTMLElement = null;
 
 
-export function isViewComponent(object:any) : object is ViewComponent
-{
-	let test:boolean = true;
-	if (object.parent === undefined) test = false;
+	/**
+	 *
+	 * @param type The event type, any type can be used
+	 * @param component The component that initiated the event
+	 * @param element The HTMLElement that initiated the event
+	 */
+	public constructor(type:string, component?:any, element?:HTMLElement)
+	{
+		super(type);
+		this.element$ = element;
+		this.component$ = component;
+	}
 
-	if (object.pause !== "function") test = false;
-	if (object.resume !== "function") test = false;
-	if (object.getView !== "function") test = false;
-	if (object.setView !== "function") test = false;
 
-	return(test)
+	/**
+	 * The component that initiated the event
+	 */
+	public get component() : any
+	{
+		return(this.component$);
+	}
+
+
+	/**
+	 * The target element that initiated the event
+	 */
+	public get target() : HTMLElement
+	{
+		return(this.element$);
+	}
 }

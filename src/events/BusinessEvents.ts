@@ -19,11 +19,13 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { BusinessEvent } from "./BusinessEvent.js";
 import { Components } from "../view/Components.js";
 import { ViewComponent } from "../public/ViewComponent.js";
+import { BusinessEventListener } from "./BusinessEventListener.js";
 
 
-export class EventHandler implements EventListenerObject
+export class BusinessEvents implements EventListenerObject
 {
    private static keys$:string[] =
    [
@@ -48,9 +50,9 @@ export class EventHandler implements EventListenerObject
       'F12'
    ];
 
-	private static curr$:any = null;
-	private static last$:ViewComponent = null;
-	private static producers$:Map<any,EventListenerObject[]> = new Map<any,EventListenerObject[]>();
+	private static curr$:TriggerComponent = null;
+	private static last$:TriggerComponent = null;
+	private static producers$:Map<any,BusinessEventListener[]> = new Map<any,BusinessEventListener[]>();
 
 
    /**
@@ -58,7 +60,7 @@ export class EventHandler implements EventListenerObject
     */
    static
    {
-      let handler:EventHandler = new EventHandler();
+      let handler:BusinessEvents = new BusinessEvents();
 
 		document.addEventListener("click",handler);
 		document.addEventListener("input",handler);
@@ -83,7 +85,7 @@ export class EventHandler implements EventListenerObject
 	 */
 	public static get current() : any
 	{
-		return(EventHandler.curr$);
+		return(BusinessEvents.curr$);
 	}
 
 
@@ -93,22 +95,27 @@ export class EventHandler implements EventListenerObject
 	}
 
 
-	public static async addEventListener(comp:EventListenerObject, target:any) : Promise<void>
+	public static async addListener(comp:BusinessEventListener, target:any) : Promise<void>
 	{
 		target = Components.getViewComponent(target);
-		let lsnrs:EventListenerObject[] = this.producers$.get(target);
+		let lsnrs:BusinessEventListener[] = this.producers$.get(target);
 		if (lsnrs) lsnrs.push(comp);
 	}
 
 
-	public static async sendCustomEvent(comp:any, event:CustomEvent) : Promise<void>
+	public static async send(event:BusinessEvent) : Promise<void>
 	{
-		event.detail.component = Components.getComponent(comp);
-		let lsnrs:EventListenerObject[] = this.producers$.get(comp);
+		let target:ViewComponent = Components.getViewComponent(event.component);
+		let lsnrs:BusinessEventListener[] = this.producers$.get(target);
 
 		for (let i = 0; lsnrs && i < lsnrs.length; i++)
 		{
-			lsnrs[i].handleEvent(event);
+			try
+			{
+				if (!await lsnrs[i].handleBusinessEvent(event))
+					break;
+			}
+			catch (error) {break;}
 		}
 	}
 
@@ -119,44 +126,66 @@ export class EventHandler implements EventListenerObject
     */
    public handleEvent(event:Event) : void
    {
+		let bevent:BusinessEvent = null;
+
 		if (event.target instanceof HTMLElement)
 		{
-			let comp:ViewComponent = Components.findViewComponent(event.target);
+			let trg:TriggerComponent = new TriggerComponent(event.target);
 
 			if (event.type == "focusin" || event.type == "click")
 			{
-				EventHandler.curr$ = Components.getComponent(comp);
+				BusinessEvents.curr$ = trg;
 
-				if (comp != EventHandler.last$)
+				if (trg.vcomp != BusinessEvents.last$?.vcomp)
 				{
-					let detail:any = null;
-					let cevent:CustomEvent = null;
-
-					if (EventHandler.last$)
+					if (BusinessEvents.last$?.vcomp)
 					{
-						detail = {target: EventHandler.last$.getView()};
-						cevent = new CustomEvent("blur",{bubbles: true, detail: detail});
-						EventHandler.sendCustomEvent(EventHandler.last$,cevent);
+						console.log("send blur")
+						bevent = new BusinessEvent("blur",BusinessEvents.last$.comp,BusinessEvents.last$.elem);
+						BusinessEvents.send(bevent);
 					}
 
-					if (comp)
+					if (trg.vcomp)
 					{
-						detail = {target: comp.getView()};
-						cevent = new CustomEvent("focus",{bubbles: true, detail: detail});
-						EventHandler.sendCustomEvent(comp,cevent);
+						bevent = new BusinessEvent("focus",trg.comp,trg.elem);
+						BusinessEvents.send(bevent);
 					}
 
-					EventHandler.last$ = comp;
+					BusinessEvents.last$ = trg;
 				}
 			}
 
-			if (comp)
+			else
+
+			if (trg.vcomp)
 			{
-				if (event instanceof KeyboardEvent && !EventHandler.keys$.includes(event.key))
+				if (event instanceof KeyboardEvent && !BusinessEvents.keys$.includes(event.key))
 					return;
 
-				comp.handleEvent(event);
+				bevent = new BusinessEvent(event.type,trg.comp,trg.elem);
+				BusinessEvents.send(bevent);
 			}
 		}
    }
+}
+
+
+class TriggerComponent
+{
+	public comp:any = null;
+	public root:HTMLElement = null;
+	public elem:HTMLElement = null;
+	public vcomp:ViewComponent = null;
+
+	constructor(target:HTMLElement)
+	{
+		this.elem = target;
+		this.vcomp = Components.findViewComponent(target);
+
+		if (this.vcomp)
+		{
+			this.root = this.vcomp.getView();
+			this.comp = Components.getComponent(this.vcomp);
+		}
+	}
 }

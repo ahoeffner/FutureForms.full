@@ -22,8 +22,9 @@
 const version = "3.0.0";
 
 
-import { EventHandler } from '../events/EventHandler.js';
 import { FormsModule as FormsModuleCore} from 'futureforms';
+import { BusinessEvents } from '../events/BusinessEvents.js';
+
 
 export class FormsModule extends FormsModuleCore
 {
@@ -58,6 +59,6 @@ export class FormsModule extends FormsModuleCore
     */
 	public static async initialize() : Promise<void>
 	{
-		EventHandler.initialize();
+		BusinessEvents.initialize();
 	}
 }
