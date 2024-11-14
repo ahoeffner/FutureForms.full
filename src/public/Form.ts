@@ -52,4 +52,10 @@ export class Form
    {
       await this.view$.setView(view);
    }
+
+
+	public getView() : HTMLElement
+	{
+		return(this.view$.getView());
+	}
 }

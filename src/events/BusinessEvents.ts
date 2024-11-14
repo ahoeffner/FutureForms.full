@@ -152,7 +152,6 @@ export class BusinessEvents implements EventListenerObject
 				{
 					if (BusinessEvents.last$?.vcomp)
 					{
-						console.log("send blur")
 						bevent = new BusinessEvent("blur",BusinessEvents.last$.comp,BusinessEvents.last$.elem);
 						BusinessEvents.send(bevent);
 					}

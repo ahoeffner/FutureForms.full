@@ -121,10 +121,7 @@ export class Window implements ViewComponent
 	public handleEvent(event:Event) : void
 	{
 		if (!this.focus$ && event.type == "mousedown")
-		{
-			//this.focus$ = true;
-			//console.log("focus");
-		}
+			this.focus$ = true;
 
 		if (event instanceof MouseEvent)
 			return(this.mhandler.handleEvent(event));
@@ -135,16 +132,15 @@ export class Window implements ViewComponent
 	{
 		if (event.type == "blur")
 		{
-			let comp:any = event.component;
-			console.log("Window received blur")
+			let current:any = BusinessEvents.current;
 
-			if (comp != this.window$ && !this.comps$.includes(comp))
-				console.log("Window blur")
+			if (current != this.window$ && !this.comps$.includes(current))
+				this.focus$ = false;
 		}
 		else
 		{
 			if (!this.focus$ && event.type == "focus")
-				console.log("Window focus")
+				this.focus$ = true;
 		}
 
 		return(true);
