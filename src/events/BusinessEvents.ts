@@ -50,6 +50,7 @@ export class BusinessEvents implements EventListenerObject
       'F12'
    ];
 
+	private static event$:Event = null;
 	private static curr$:TriggerComponent = null;
 	private static last$:TriggerComponent = null;
 	private static producers$:Map<any,BusinessEventListener[]> = new Map<any,BusinessEventListener[]>();
@@ -83,7 +84,16 @@ export class BusinessEvents implements EventListenerObject
 	/**
 	 * The current focused Component
 	 */
-	public static get current() : any
+	public static lastEvent() : Event
+	{
+		return(BusinessEvents.event$);
+	}
+
+
+	/**
+	 * The current focused Component
+	 */
+	public static currentComponent() : any
 	{
 		return(BusinessEvents.curr$.comp);
 	}
@@ -138,6 +148,7 @@ export class BusinessEvents implements EventListenerObject
     */
    public handleEvent(event:Event) : void
    {
+		BusinessEvents.event$ = event;
 		let bevent:BusinessEvent = null;
 
 		if (event.target instanceof HTMLElement)

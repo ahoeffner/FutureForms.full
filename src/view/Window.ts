@@ -132,7 +132,7 @@ export class Window implements ViewComponent
 	{
 		if (event.type == "blur")
 		{
-			let current:any = BusinessEvents.current;
+			let current:any = BusinessEvents.currentComponent();
 
 			if (current != this.window$ && !this.comps$.includes(current))
 				this.focus$ = false;

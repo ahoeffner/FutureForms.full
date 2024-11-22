@@ -26,4 +26,9 @@ export { Properties } from './src/public/Properties.js';
 export { Components } from './src/public/Components.js';
 export { FormsModule } from './src/public/FormsModule.js';
 
+export { EventQueue } from './src/events/EventQueue.js';
+export { BusinessEvent } from './src/events/BusinessEvent.js';
+export { BusinessEvents } from './src/events/BusinessEvents.js';
+export { BusinessEventListener } from './src/events/BusinessEventListener.js';
+
 export { Source } from './src/model/Source.js';
