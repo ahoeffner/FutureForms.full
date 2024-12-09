@@ -19,26 +19,10 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { BusinessEvent } from "./BusinessEvent.js";
-
-
-/**
- * BusinessEvents are handled asyncronious allowing for comunication
- * with backend systems. Also, they are handled in an orderly manner, one by one
- */
-export interface BusinessEventListener
+export class EventFilter
 {
 	/**
-	 * The priority compared to other listeners.
-	 * When an event is raised, all eligable listeners
-	 * are sorted by priority before invokation. Undefined goes last.
+	 * The class instance that produced the event
 	 */
-	priority?:number;
-
-	/**
-	 *
-	 * @param event Any BusinessEvent that was registered for
-	 * The return value indicates if the next listener should be invoked
-	 */
-	handleBusinessEvent?(event:BusinessEvent) : Promise<boolean>;
+	component?:any;
 }

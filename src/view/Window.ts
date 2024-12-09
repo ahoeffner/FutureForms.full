@@ -22,6 +22,7 @@
 import { Parser } from "./Parser.js";
 import { Components } from "./Components.js";
 import { Properties } from "../public/Properties.js";
+import { EventFilter } from "../events/EventFilter.js";
 import { Window as Parent } from "../public/Window.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
@@ -42,6 +43,7 @@ export class Window implements ViewComponent
 	constructor(window:Parent)
 	{
 		this.window$ = window;
+		BusinessEvents.register(this);
 		Components.bind(this.window$,this);
 	}
 
@@ -83,14 +85,16 @@ export class Window implements ViewComponent
    {
 		Components.remove(this);
 
+		let filter:EventFilter = {};
       let parser:Parser = new Parser();
-      await parser.parse(view);
 
+		await parser.parse(view);
 		this.comps$ = parser.getComponents();
 
 		this.comps$.forEach((comp) =>
 		{
-			BusinessEvents.addListener(this,comp);
+			filter.component = comp;
+			BusinessEvents.addListener(this,filter);
 			comp = Components.getViewComponent(comp);
 			if (comp) comp.parent = this;
 		})
@@ -121,7 +125,10 @@ export class Window implements ViewComponent
 	public handleEvent(event:Event) : void
 	{
 		if (!this.focus$ && event.type == "mousedown")
+		{
 			this.focus$ = true;
+			console.log("MH send window focus")
+		}
 
 		if (event instanceof MouseEvent)
 			return(this.mhandler.handleEvent(event));
@@ -135,12 +142,18 @@ export class Window implements ViewComponent
 			let current:any = BusinessEvents.currentComponent();
 
 			if (current != this.window$ && !this.comps$.includes(current))
+			{
 				this.focus$ = false;
+				console.log("BE send window blur")
+			}
 		}
 		else
 		{
 			if (!this.focus$ && event.type == "focus")
+			{
 				this.focus$ = true;
+				console.log("BE send window focus")
+			}
 		}
 
 		return(true);

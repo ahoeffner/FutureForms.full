@@ -19,6 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { EventFilter } from "./EventFilter.js";
 import { BusinessEvent } from "./BusinessEvent.js";
 import { Components } from "../view/Components.js";
 import { ViewComponent } from "../public/ViewComponent.js";
@@ -112,13 +113,16 @@ export class BusinessEvents implements EventListenerObject
 	/**
 	 * Add a listener to a business event producer
 	 * @param comp The class to receive events
-	 * @param target The producer of business events
+	 * @param target The class that raise events
 	 */
-	public static async addListener(comp:BusinessEventListener, target:any) : Promise<void>
+	public static async addListener(comp:BusinessEventListener, filter?:EventFilter) : Promise<void>
 	{
-		target = Components.getViewComponent(target);
-		let lsnrs:BusinessEventListener[] = this.producers$.get(target);
-		if (lsnrs) lsnrs.push(comp);
+		if (filter.component)
+		{
+			let target = Components.getViewComponent(filter.component);
+			let lsnrs:BusinessEventListener[] = this.producers$.get(target);
+			if (lsnrs) lsnrs.push(comp);
+		}
 	}
 
 
@@ -130,6 +134,8 @@ export class BusinessEvents implements EventListenerObject
 	{
 		let target:ViewComponent = Components.getViewComponent(event.component);
 		let lsnrs:BusinessEventListener[] = this.producers$.get(target);
+
+		//console.log("send "+event.type,lsnrs,"from",event.component)
 
 		for (let i = 0; lsnrs && i < lsnrs.length; i++)
 		{
@@ -159,8 +165,9 @@ export class BusinessEvents implements EventListenerObject
 			{
 				BusinessEvents.curr$ = trg;
 
-				if (trg.vcomp != BusinessEvents.last$?.vcomp)
+				if (!trg || trg.vcomp != BusinessEvents.last$?.vcomp)
 				{
+					console.log("shift focus last: "+BusinessEvents.last$?.vcomp+" trg: "+trg)
 					if (BusinessEvents.last$?.vcomp)
 					{
 						bevent = new BusinessEvent("blur",BusinessEvents.last$.comp,BusinessEvents.last$.elem);
