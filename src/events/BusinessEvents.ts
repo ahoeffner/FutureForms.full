@@ -135,8 +135,6 @@ export class BusinessEvents implements EventListenerObject
 		let target:ViewComponent = Components.getViewComponent(event.component);
 		let lsnrs:BusinessEventListener[] = this.producers$.get(target);
 
-		//console.log("send "+event.type,lsnrs,"from",event.component)
-
 		for (let i = 0; lsnrs && i < lsnrs.length; i++)
 		{
 			try
@@ -165,19 +163,35 @@ export class BusinessEvents implements EventListenerObject
 			{
 				BusinessEvents.curr$ = trg;
 
+				let next:ViewComponent[] = trg.getComponents(trg.elem);
+				let prev:ViewComponent[] = trg.getComponents(BusinessEvents.last$?.elem);
+
 				if (!trg || trg.vcomp != BusinessEvents.last$?.vcomp)
 				{
-					console.log("shift focus last: "+BusinessEvents.last$?.vcomp+" trg: "+trg)
 					if (BusinessEvents.last$?.vcomp)
 					{
-						bevent = new BusinessEvent("blur",BusinessEvents.last$.comp,BusinessEvents.last$.elem);
-						BusinessEvents.send(bevent);
+						for (let i = 0; i < prev.length; i++)
+						{
+							if (!next.includes(prev[i]))
+							{
+								console.log("blur",prev[i]?.constructor.name);
+								bevent = new BusinessEvent("blur",prev[i],trg.elem);
+								BusinessEvents.send(bevent);
+							}
+						}
 					}
 
 					if (trg.vcomp)
 					{
-						bevent = new BusinessEvent("focus",trg.comp,trg.elem);
-						BusinessEvents.send(bevent);
+						for (let i = 0; i < next.length; i++)
+						{
+							if (!prev.includes(next[i]))
+							{
+								console.log("focus",next[i].constructor?.name);
+								bevent = new BusinessEvent("focus",next[i],trg.elem);
+								BusinessEvents.send(bevent);
+							}
+						}
 					}
 
 					BusinessEvents.last$ = trg;
@@ -216,5 +230,22 @@ class TriggerComponent
 			this.root = this.vcomp.getView();
 			this.comp = Components.getComponent(this.vcomp);
 		}
+	}
+
+
+	public getComponents(view:HTMLElement) : ViewComponent[]
+	{
+		let list:ViewComponent[] = [];
+
+		let comp:ViewComponent = Components.findViewComponent(view);
+
+		while (comp)
+		{
+			list.push(comp);
+			view = comp.getView().parentElement;
+			comp = Components.findViewComponent(view);
+		}
+
+		return(list);
 	}
 }

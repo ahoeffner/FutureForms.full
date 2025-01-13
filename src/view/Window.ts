@@ -34,7 +34,6 @@ export class Window implements ViewComponent
 {
 	private comps$:any[] = [];
 	private window$:Parent = null;
-	private focus$:boolean = false;
 	private view$:HTMLElement = null;
 	private parent$:ViewComponent = null;
 	private mhandler:MouseHandler = new MouseHandler();
@@ -45,6 +44,7 @@ export class Window implements ViewComponent
 		this.window$ = window;
 		BusinessEvents.register(this);
 		Components.bind(this.window$,this);
+		BusinessEvents.addListener(this,{component: this});
 	}
 
 	public get parent() : ViewComponent
@@ -85,7 +85,6 @@ export class Window implements ViewComponent
    {
 		Components.remove(this);
 
-		let filter:EventFilter = {};
       let parser:Parser = new Parser();
 
 		await parser.parse(view);
@@ -93,8 +92,6 @@ export class Window implements ViewComponent
 
 		this.comps$.forEach((comp) =>
 		{
-			filter.component = comp;
-			BusinessEvents.addListener(this,filter);
 			comp = Components.getViewComponent(comp);
 			if (comp) comp.parent = this;
 		})
@@ -124,12 +121,6 @@ export class Window implements ViewComponent
 
 	public handleEvent(event:Event) : void
 	{
-		if (!this.focus$ && event.type == "mousedown")
-		{
-			this.focus$ = true;
-			console.log("MH send window focus")
-		}
-
 		if (event instanceof MouseEvent)
 			return(this.mhandler.handleEvent(event));
 	}
@@ -137,25 +128,7 @@ export class Window implements ViewComponent
 
 	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
-		if (event.type == "blur")
-		{
-			let current:any = BusinessEvents.currentComponent();
-
-			if (current != this.window$ && !this.comps$.includes(current))
-			{
-				this.focus$ = false;
-				console.log("BE send window blur")
-			}
-		}
-		else
-		{
-			if (!this.focus$ && event.type == "focus")
-			{
-				this.focus$ = true;
-				console.log("BE send window focus")
-			}
-		}
-
+		console.log("Window: "+event.type);
 		return(true);
 	}
 }

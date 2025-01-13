@@ -38,10 +38,10 @@ export function isViewComponent(object:any) : object is ViewComponent
 	let test:boolean = true;
 	if (object.parent === undefined) test = false;
 
-	if (object.pause !== "function") test = false;
-	if (object.resume !== "function") test = false;
-	if (object.getView !== "function") test = false;
-	if (object.setView !== "function") test = false;
+	if (typeof object.pause !== "function") test = false;
+	if (typeof object.resume !== "function") test = false;
+	if (typeof object.getView !== "function") test = false;
+	if (typeof object.setView !== "function") test = false;
 
 	return(test)
 }
