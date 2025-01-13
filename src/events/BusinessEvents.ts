@@ -174,7 +174,6 @@ export class BusinessEvents implements EventListenerObject
 						{
 							if (!next.includes(prev[i]))
 							{
-								console.log("blur",prev[i]?.constructor.name);
 								bevent = new BusinessEvent("blur",prev[i],trg.elem);
 								BusinessEvents.send(bevent);
 							}
@@ -187,7 +186,6 @@ export class BusinessEvents implements EventListenerObject
 						{
 							if (!prev.includes(next[i]))
 							{
-								console.log("focus",next[i].constructor?.name);
 								bevent = new BusinessEvent("focus",next[i],trg.elem);
 								BusinessEvents.send(bevent);
 							}

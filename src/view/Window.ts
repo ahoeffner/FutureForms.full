@@ -22,7 +22,6 @@
 import { Parser } from "./Parser.js";
 import { Components } from "./Components.js";
 import { Properties } from "../public/Properties.js";
-import { EventFilter } from "../events/EventFilter.js";
 import { Window as Parent } from "../public/Window.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
