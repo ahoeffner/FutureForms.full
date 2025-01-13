@@ -37,7 +37,7 @@ export class ViewMediator
 	}
 
 
-	public bring2front(element:HTMLElement) : void
+	public front(element:HTMLElement) : void
 	{
 		element.style.zIndex = (++ViewMediator.zindex)+"";
 	}

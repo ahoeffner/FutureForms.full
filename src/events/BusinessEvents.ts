@@ -64,10 +64,10 @@ export class BusinessEvents implements EventListenerObject
    {
       let handler:BusinessEvents = new BusinessEvents();
 
-		document.addEventListener("click",handler);
 		document.addEventListener("input",handler);
 		document.addEventListener("keydown",handler);
 		document.addEventListener("focusin",handler);
+		document.addEventListener("mousedown",handler);
    }
 
 
@@ -159,7 +159,7 @@ export class BusinessEvents implements EventListenerObject
 		{
 			let trg:TriggerComponent = new TriggerComponent(event.target);
 
-			if (event.type == "focusin" || event.type == "click")
+			if (event.type == "focusin" || event.type == "mousedown")
 			{
 				BusinessEvents.curr$ = trg;
 
