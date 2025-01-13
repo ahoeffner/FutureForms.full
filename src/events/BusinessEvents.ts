@@ -163,6 +163,7 @@ export class BusinessEvents implements EventListenerObject
 			{
 				BusinessEvents.curr$ = trg;
 
+				let comp:any = null;
 				let next:ViewComponent[] = trg.getComponents(trg.elem);
 				let prev:ViewComponent[] = trg.getComponents(BusinessEvents.last$?.elem);
 
@@ -174,7 +175,8 @@ export class BusinessEvents implements EventListenerObject
 						{
 							if (!next.includes(prev[i]))
 							{
-								bevent = new BusinessEvent("blur",prev[i],trg.elem);
+								comp = Components.getComponent(prev[i]);
+								bevent = new BusinessEvent("blur",comp,trg.elem);
 								BusinessEvents.send(bevent);
 							}
 						}
@@ -186,7 +188,8 @@ export class BusinessEvents implements EventListenerObject
 						{
 							if (!prev.includes(next[i]))
 							{
-								bevent = new BusinessEvent("focus",next[i],trg.elem);
+								comp = Components.getComponent(next[i]);
+								bevent = new BusinessEvent("focus",comp,trg.elem);
 								BusinessEvents.send(bevent);
 							}
 						}

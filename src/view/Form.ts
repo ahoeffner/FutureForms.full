@@ -106,7 +106,6 @@ export class Form implements ViewComponent
 
 	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
-		console.log("form",event)
 		return(true);
 	}
 }
