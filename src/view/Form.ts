@@ -47,6 +47,7 @@ export class Form implements ViewComponent
 		this.form$ = form;
 		BusinessEvents.register(this);
 		Components.bind(this.form$,this);
+		BusinessEvents.addListener(this,{component: this});
    }
 
 	public get form() : Parent
