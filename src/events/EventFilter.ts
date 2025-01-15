@@ -19,10 +19,34 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { BusinessEvent } from "./BusinessEvent";
+
 export class EventFilter
 {
-	/**
-	 * The class instance that produced the event
-	 */
-	component?:any;
+	static DefaultComparator:FilterComparator = (event:BusinessEvent, filter:EventFilter) =>
+	{
+		let match:number = 0;
+
+		if (event.type == filter.type)
+			match++;
+
+		if (event.component == filter.component)
+			match++;
+
+		return(match);
+	}
+
+	/** The event to filter on.*/
+	public type?:string = null;
+
+	/** The component to filter on.*/
+	public component?:any = null;
+
+	/** Any extra data for use in compare.*/
+	public properties?:Map<any,any> = null;
+
+	/** The comparator to calculate the priority.*/
+	public comparator?:FilterComparator = null;
 }
+
+export type FilterComparator = (event:BusinessEvent, filter:EventFilter) => number;

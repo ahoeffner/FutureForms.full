@@ -54,7 +54,7 @@ export class BusinessEvents implements EventListenerObject
 	private static event$:Event = null;
 	private static curr$:TriggerComponent = null;
 	private static last$:TriggerComponent = null;
-	private static producers$:Map<any,BusinessEventListener[]> = new Map<any,BusinessEventListener[]>();
+	private static producers$:Map<any,Listener[]> = new Map<any,Listener[]>();
 
 
    /**
@@ -120,8 +120,14 @@ export class BusinessEvents implements EventListenerObject
 		if (filter.component)
 		{
 			let target = Components.getViewComponent(filter.component);
-			let lsnrs:BusinessEventListener[] = this.producers$.get(target);
-			if (lsnrs) lsnrs.push(comp);
+			let lsnrs:Listener[] = this.producers$.get(target);
+			if (lsnrs) lsnrs.push(new Listener(comp,filter));
+		}
+		else
+		{
+			let lsnrs:Listener[] = this.producers$.get(null);
+			if (!lsnrs) {lsnrs = []; this.producers$.set(null,lsnrs);}
+			lsnrs.push(new Listener(comp,filter));
 		}
 	}
 
@@ -132,14 +138,46 @@ export class BusinessEvents implements EventListenerObject
 	 */
 	public static async send(event:BusinessEvent) : Promise<void>
 	{
-		let target:ViewComponent = Components.getViewComponent(event.component);
-		let lsnrs:BusinessEventListener[] = this.producers$.get(target);
+		let chits:Listener[] = [];	// Component listener hits
+		let ahits:Listener[] = [];	// Component agnostic listener hits
 
-		for (let i = 0; lsnrs && i < lsnrs.length; i++)
+		let target:ViewComponent = Components.getViewComponent(event.component);
+		let lsnrs:Listener[] = this.producers$.get(target);
+
+		// Find all component listeners that match the event
+		if (lsnrs) for (let i = 0; i < lsnrs.length; i++)
+		{
+			if (!lsnrs[i].filter.comparator)
+				lsnrs[i].filter.comparator = EventFilter.DefaultComparator;
+
+			lsnrs[i].match = lsnrs[i].filter.comparator(event,lsnrs[i].filter);
+			if (lsnrs[i].match > 0) chits.push(lsnrs[i]);
+		}
+
+		// Find no component listeners that match the event
+		if (target) lsnrs = this.producers$.get(null);
+
+		if (lsnrs) for (let i = 0; i < lsnrs.length; i++)
+		{
+			if (!lsnrs[i].filter.comparator)
+				lsnrs[i].filter.comparator = EventFilter.DefaultComparator;
+
+			lsnrs[i].match = lsnrs[i].filter.comparator(event,lsnrs[i].filter);
+			if (lsnrs[i].match > 0) ahits.push(lsnrs[i]);
+		}
+
+		// Sort the listeners by match
+		chits = chits.sort((a,b) => a.match - b.match);
+		ahits = chits.sort((a,b) => a.match - b.match);
+
+		// Add no component listeners
+		lsnrs = chits.concat(ahits);
+
+		for (let i = 0; i < lsnrs.length; i++)
 		{
 			try
 			{
-				if (!await lsnrs[i].handleBusinessEvent(event))
+				if (!await lsnrs[i].listener.handleBusinessEvent(event))
 					break;
 			}
 			catch (error) {break;}
@@ -248,5 +286,19 @@ class TriggerComponent
 		}
 
 		return(list);
+	}
+}
+
+
+class Listener
+{
+	public match:number = 0;
+	public filter:EventFilter = null;
+	public listener:BusinessEventListener = null;
+
+	constructor(listener:BusinessEventListener, filter:EventFilter)
+	{
+		this.listener = listener;
+		this.filter = filter;
 	}
 }

@@ -29,13 +29,6 @@ import { BusinessEvent } from "./BusinessEvent.js";
 export interface BusinessEventListener
 {
 	/**
-	 * The priority compared to other listeners.
-	 * When an event is raised, all eligable listeners
-	 * are sorted by priority before invokation. Undefined goes last.
-	 */
-	priority?:number;
-
-	/**
 	 *
 	 * @param event Any BusinessEvent that was registered for
 	 * The return value indicates if the next listener should be invoked
