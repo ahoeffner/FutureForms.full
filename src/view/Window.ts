@@ -127,7 +127,7 @@ export class Window implements ViewComponent
 
 	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
-		if (event.type == "focus")
+		if (event.type == "enter")
 			ViewMediator.impl.front(this.view$);
 
 		return(true);

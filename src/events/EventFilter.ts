@@ -27,26 +27,37 @@ export class EventFilter
 	{
 		let match:number = 0;
 
-		if (event.type == filter.type)
-			match++;
+		if (event.type)
+		{
+			if (event.type != filter.type)
+				return(-1);
 
-		if (event.component == filter.component)
 			match++;
+		}
+
+		if (event.component)
+		{
+			if (event.component != filter.component)
+				return(-1);
+
+			match++;
+		}
 
 		return(match);
 	}
 
-	/** The event to filter on.*/
+	/** The event to filter on */
 	public type?:string = null;
 
-	/** The component to filter on.*/
+	/** The component to filter on */
 	public component?:any = null;
 
-	/** Any extra data for use in compare.*/
+	/** Any extra data for use in compare */
 	public properties?:Map<any,any> = null;
 
-	/** The comparator to calculate the priority.*/
+	/** The comparator to calculate the match */
 	public comparator?:FilterComparator = null;
 }
 
+/** The return value indicates the match. Less than 0 means no match */
 export type FilterComparator = (event:BusinessEvent, filter:EventFilter) => number;

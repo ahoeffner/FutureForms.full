@@ -151,7 +151,7 @@ export class BusinessEvents implements EventListenerObject
 				lsnrs[i].filter.comparator = EventFilter.DefaultComparator;
 
 			lsnrs[i].match = lsnrs[i].filter.comparator(event,lsnrs[i].filter);
-			if (lsnrs[i].match > 0) chits.push(lsnrs[i]);
+			if (lsnrs[i].match >= 0) chits.push(lsnrs[i]);
 		}
 
 		// Find no component listeners that match the event
@@ -163,7 +163,7 @@ export class BusinessEvents implements EventListenerObject
 				lsnrs[i].filter.comparator = EventFilter.DefaultComparator;
 
 			lsnrs[i].match = lsnrs[i].filter.comparator(event,lsnrs[i].filter);
-			if (lsnrs[i].match > 0) ahits.push(lsnrs[i]);
+			if (lsnrs[i].match >= 0) ahits.push(lsnrs[i]);
 		}
 
 		// Sort the listeners by match
@@ -214,7 +214,7 @@ export class BusinessEvents implements EventListenerObject
 							if (!next.includes(prev[i]))
 							{
 								comp = Components.getComponent(prev[i]);
-								bevent = new BusinessEvent("blur",comp,trg.elem);
+								bevent = new BusinessEvent("leave",comp,trg.elem);
 								BusinessEvents.send(bevent);
 							}
 						}
@@ -222,18 +222,24 @@ export class BusinessEvents implements EventListenerObject
 
 					if (trg.vcomp)
 					{
-						for (let i = 0; i < next.length; i++)
+						for (let i = next.length - 1; i >= 0; i--)
 						{
 							if (!prev.includes(next[i]))
 							{
 								comp = Components.getComponent(next[i]);
-								bevent = new BusinessEvent("focus",comp,trg.elem);
+								bevent = new BusinessEvent("enter",comp,trg.elem);
 								BusinessEvents.send(bevent);
 							}
 						}
 					}
 
 					BusinessEvents.last$ = trg;
+				}
+
+				if (trg && event.type == "focusin")
+				{
+					bevent = new BusinessEvent("focus",trg.comp,trg.elem);
+					BusinessEvents.send(bevent);
 				}
 			}
 
