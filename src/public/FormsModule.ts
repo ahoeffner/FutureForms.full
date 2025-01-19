@@ -59,6 +59,5 @@ export class FormsModule extends FormsModuleCore
     */
 	public static async initialize() : Promise<void>
 	{
-		BusinessEvents.initialize();
 	}
 }

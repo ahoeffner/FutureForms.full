@@ -19,11 +19,45 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { Class } from "../public/Class";
 import { BusinessEvent } from "./BusinessEvent";
+
 
 export class EventFilter
 {
-	static DefaultComparator:FilterComparator = (event:BusinessEvent, filter:EventFilter) =>
+	private static handlers$:Map<Class<EventFilter>,FilterComparator> = new Map<Class<EventFilter>,FilterComparator>();
+
+	/**
+	 * Register a new filter
+	 * @param filter The filter to register
+	 * @param comparator The comparator to use
+	 */
+	public static register(filter:Class<EventFilter>, comparator:FilterComparator) : void
+	{
+		EventFilter.handlers$.set(filter,comparator);
+	}
+
+
+	/**
+	 * Remove the filter
+	 */
+	remove(filter:Class<EventFilter>) : void
+	{
+		EventFilter.handlers$.delete(filter);
+	}
+
+
+	/**
+	 * Get the comparator for the filter
+	 * @param filter The filter to get the comparator for
+	 */
+	public static getComparator(filter:Class<EventFilter>) : FilterComparator
+	{
+		return(EventFilter.handlers$.get(filter));
+	}
+
+
+	public static DefaultComparator:FilterComparator = (event:BusinessEvent, filter:EventFilter) =>
 	{
 		let match:number = 0;
 
@@ -51,12 +85,6 @@ export class EventFilter
 
 	/** The component to filter on */
 	public component?:any = null;
-
-	/** Any extra data for use in compare */
-	public properties?:Map<any,any> = null;
-
-	/** The comparator to calculate the match */
-	public comparator?:FilterComparator = null;
 }
 
 /** The return value indicates the match. Less than 0 means no match */

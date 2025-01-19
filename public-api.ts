@@ -31,4 +31,6 @@ export { BusinessEvent } from './src/events/BusinessEvent.js';
 export { BusinessEvents } from './src/events/BusinessEvents.js';
 export { BusinessEventListener } from './src/events/BusinessEventListener.js';
 
+export { FormEventFilter } from './src/events/FormEvent.js';
+
 export { Source } from './src/model/Source.js';

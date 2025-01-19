@@ -23,6 +23,7 @@ export class BusinessEvent extends Event
 {
 	private component$:any = null;
 	private element$:HTMLElement = null;
+	private properties$:Map<any,any> = null;
 
 
 	/**
@@ -31,11 +32,12 @@ export class BusinessEvent extends Event
 	 * @param component The component that initiated the event
 	 * @param element The HTMLElement that initiated the event
 	 */
-	public constructor(type:string, component?:any, element?:HTMLElement)
+	public constructor(type:string, component?:any, element?:HTMLElement, properties?:Map<any,any>)
 	{
 		super(type);
 		this.element$ = element;
 		this.component$ = component;
+		this.properties$ = properties;
 	}
 
 
@@ -45,6 +47,13 @@ export class BusinessEvent extends Event
 	public get component() : any
 	{
 		return(this.component$);
+	}
+
+	
+	/** Any extra data for use in compare */
+	public get properties() : Map<any,any>
+	{
+		return(this.properties$);
 	}
 
 

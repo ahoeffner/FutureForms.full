@@ -19,38 +19,17 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { EventFilter } from "./EventFilter.js";
+import { Class } from "../public/Class.js";
+import { EventQueue } from "./EventQueue.js";
 import { BusinessEvent } from "./BusinessEvent.js";
 import { Components } from "../view/Components.js";
 import { ViewComponent } from "../public/ViewComponent.js";
+import { EventFilter, FilterComparator } from "./EventFilter.js";
 import { BusinessEventListener } from "./BusinessEventListener.js";
 
 
 export class BusinessEvents implements EventListenerObject
 {
-   private static keys$:string[] =
-   [
-      'Tab',
-      'Enter',
-      'Escape',
-      'PageUp',
-      'PageDown',
-      'ArrowUp',
-      'ArrowDown',
-      'F1',
-      'F2',
-      'F3',
-      'F4',
-      'F5',
-      'F6',
-      'F7',
-      'F8',
-      'F9',
-      'F10',
-      'F11',
-      'F12'
-   ];
-
 	private static event$:Event = null;
 	private static curr$:TriggerComponent = null;
 	private static last$:TriggerComponent = null;
@@ -69,15 +48,6 @@ export class BusinessEvents implements EventListenerObject
 		document.addEventListener("focusin",handler);
 		document.addEventListener("mousedown",handler);
    }
-
-
-	/**
-	 * Ensure static constructor
-	 */
-	public static initialize() : void
-	{
-	}
-
 
 	private constructor() {};
 
@@ -136,7 +106,7 @@ export class BusinessEvents implements EventListenerObject
 	 * Send a business event
 	 * @param event
 	 */
-	public static async send(event:BusinessEvent) : Promise<void>
+	public static async send(event:BusinessEvent, queue?:EventQueue) : Promise<void>
 	{
 		let chits:Listener[] = [];	// Component listener hits
 		let ahits:Listener[] = [];	// Component agnostic listener hits
@@ -147,22 +117,26 @@ export class BusinessEvents implements EventListenerObject
 		// Find all component listeners that match the event
 		if (lsnrs) for (let i = 0; i < lsnrs.length; i++)
 		{
-			if (!lsnrs[i].filter.comparator)
-				lsnrs[i].filter.comparator = EventFilter.DefaultComparator;
+			let ftype:Class<EventFilter> = lsnrs[i].filter.constructor as Class<EventFilter>;
 
-			lsnrs[i].match = lsnrs[i].filter.comparator(event,lsnrs[i].filter);
+			let comparator:FilterComparator = EventFilter.getComparator(ftype);
+			if (!comparator) comparator = EventFilter.DefaultComparator;
+
+			lsnrs[i].match = comparator(event,lsnrs[i].filter);
 			if (lsnrs[i].match >= 0) chits.push(lsnrs[i]);
 		}
 
-		// Find no component listeners that match the event
+		// Find non component listeners that match the event
 		if (target) lsnrs = this.producers$.get(null);
 
 		if (lsnrs) for (let i = 0; i < lsnrs.length; i++)
 		{
-			if (!lsnrs[i].filter.comparator)
-				lsnrs[i].filter.comparator = EventFilter.DefaultComparator;
+			let ftype:Class<EventFilter> = lsnrs[i].filter.constructor as Class<EventFilter>;
 
-			lsnrs[i].match = lsnrs[i].filter.comparator(event,lsnrs[i].filter);
+			let comparator:FilterComparator = EventFilter.getComparator(ftype);
+			if (!comparator) comparator = EventFilter.DefaultComparator;
+
+			lsnrs[i].match = comparator(event,lsnrs[i].filter);
 			if (lsnrs[i].match >= 0) ahits.push(lsnrs[i]);
 		}
 
@@ -215,7 +189,7 @@ export class BusinessEvents implements EventListenerObject
 							{
 								comp = Components.getComponent(prev[i]);
 								bevent = new BusinessEvent("leave",comp,trg.elem);
-								BusinessEvents.send(bevent);
+								prev[i].handleBusinessEvent(bevent);
 							}
 						}
 					}
@@ -228,7 +202,7 @@ export class BusinessEvents implements EventListenerObject
 							{
 								comp = Components.getComponent(next[i]);
 								bevent = new BusinessEvent("enter",comp,trg.elem);
-								BusinessEvents.send(bevent);
+								next[i].handleBusinessEvent(bevent);
 							}
 						}
 					}
@@ -236,10 +210,10 @@ export class BusinessEvents implements EventListenerObject
 					BusinessEvents.last$ = trg;
 				}
 
-				if (trg && event.type == "focusin")
+				if (trg.vcomp && event.type == "focusin")
 				{
 					bevent = new BusinessEvent("focus",trg.comp,trg.elem);
-					BusinessEvents.send(bevent);
+					trg.vcomp.handleBusinessEvent(bevent)
 				}
 			}
 
@@ -247,11 +221,8 @@ export class BusinessEvents implements EventListenerObject
 
 			if (trg.vcomp)
 			{
-				if (event instanceof KeyboardEvent && !BusinessEvents.keys$.includes(event.key))
-					return;
-
 				bevent = new BusinessEvent(event.type,trg.comp,trg.elem);
-				BusinessEvents.send(bevent);
+				trg.vcomp.handleBusinessEvent(bevent)
 			}
 		}
    }

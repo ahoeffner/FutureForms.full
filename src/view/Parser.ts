@@ -85,6 +85,23 @@ export class Parser
    }
 
 
+   public getComponentsByName(clazz:string) : any[]
+   {
+		let all:any[] = [];
+
+		this.comps$.forEach((comps) =>
+		{
+			comps.forEach((comp) =>
+			{
+				if (comp.constructor.name == clazz)
+					all.push(comp);
+			})
+		});
+
+		return(all);
+   }
+
+
    private async parseContent(element?:HTMLElement) : Promise<void>
    {
 		if (!element)

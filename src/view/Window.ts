@@ -43,7 +43,6 @@ export class Window implements ViewComponent
 		this.window$ = window;
 		BusinessEvents.register(this);
 		Components.bind(this.window$,this);
-		BusinessEvents.addListener(this,{component: this});
 	}
 
 	public get parent() : ViewComponent
@@ -127,6 +126,8 @@ export class Window implements ViewComponent
 
 	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
+		console.log("Window event "+event.type);
+
 		if (event.type == "enter")
 			ViewMediator.impl.front(this.view$);
 

@@ -44,7 +44,7 @@ export class Components
    }
 
 
-   public static register(tagname:string, clazz:Class<any>, factory?:Class<ComponentFactory>) : void
+   public static bind(tagname:string, clazz:Class<any>, factory?:Class<ComponentFactory>) : void
    {
       if (!factory) factory = DefaultViewComponentFactory;
       this.classes$.set(tagname.toLowerCase(),new ComponentEntry(clazz,factory));

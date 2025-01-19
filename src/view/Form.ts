@@ -19,6 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+
 import { Parser } from "./Parser.js";
 import { Components } from "./Components.js";
 import { Form as Parent } from "../public/Form.js";
@@ -36,6 +37,29 @@ import { BusinessEvents } from "../events/BusinessEvents.js";
  */
 export class Form implements ViewComponent
 {
+	private static keys$:string[] =
+	[
+		'Tab',
+		'Enter',
+		'Escape',
+		'PageUp',
+		'PageDown',
+		'ArrowUp',
+		'ArrowDown',
+		'F1',
+		'F2',
+		'F3',
+		'F4',
+		'F5',
+		'F6',
+		'F7',
+		'F8',
+		'F9',
+		'F10',
+		'F11',
+		'F12'
+	];
+
 	private form$:Parent = null;
 	private model$:ModelForm = null;
 	private view$:HTMLElement = null;
@@ -47,7 +71,6 @@ export class Form implements ViewComponent
 		this.form$ = form;
 		BusinessEvents.register(this);
 		Components.bind(this.form$,this);
-		BusinessEvents.addListener(this,{component: this});
    }
 
 	public get form() : Parent
@@ -106,6 +129,7 @@ export class Form implements ViewComponent
 
 	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
+		console.log("Form event "+event.type);
 		return(true);
 	}
 }
