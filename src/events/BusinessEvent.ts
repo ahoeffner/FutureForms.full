@@ -49,10 +49,11 @@ export class BusinessEvent extends Event
 		return(this.component$);
 	}
 
-	
+
 	/** Any extra data for use in compare */
 	public get properties() : Map<any,any>
 	{
+		if (!this.properties$) this.properties$ = new Map();
 		return(this.properties$);
 	}
 

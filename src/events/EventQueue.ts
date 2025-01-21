@@ -29,6 +29,8 @@ export class EventQueue
 {
 	private name$:string = null;
 	private queue$:Resolve<any>[] = [];
+	
+	public static DefaultEventQueue:EventQueue = new EventQueue("default");
 
 
 	/**

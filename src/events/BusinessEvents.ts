@@ -87,7 +87,7 @@ export class BusinessEvents implements EventListenerObject
 	 */
 	public static async addListener(comp:BusinessEventListener, filter?:EventFilter) : Promise<void>
 	{
-		if (filter.component)
+		if (filter.component && typeof filter.component !== "string")
 		{
 			let target = Components.getViewComponent(filter.component);
 			let lsnrs:Listener[] = this.producers$.get(target);
@@ -106,7 +106,7 @@ export class BusinessEvents implements EventListenerObject
 	 * Send a business event
 	 * @param event
 	 */
-	public static async send(event:BusinessEvent, queue?:EventQueue) : Promise<void>
+	public static async send(event:BusinessEvent) : Promise<void>
 	{
 		let chits:Listener[] = [];	// Component listener hits
 		let ahits:Listener[] = [];	// Component agnostic listener hits

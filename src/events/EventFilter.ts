@@ -71,8 +71,23 @@ export class EventFilter
 
 		if (event.component)
 		{
-			if (event.component != filter.component)
+			if (typeof filter.component === "string")
+			{
+				if (Object.hasOwn(event,"name"))
+				{
+					if (event["name"] != filter.component)
+						return(-1);
+				}
+				else
+				{
+					if (event.constructor.name != filter.component)
+						return(-1);
+				}
+			}
+			else if (event.component != filter.component)
+			{
 				return(-1);
+			}
 
 			match++;
 		}

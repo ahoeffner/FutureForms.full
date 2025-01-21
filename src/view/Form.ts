@@ -28,6 +28,7 @@ import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 import { BusinessEvent } from "../events/BusinessEvent.js";
 import { BusinessEvents } from "../events/BusinessEvents.js";
+import { EventQueue } from "../events/EventQueue.js";
 
 
 /**
@@ -37,6 +38,8 @@ import { BusinessEvents } from "../events/BusinessEvents.js";
  */
 export class Form implements ViewComponent
 {
+	private static queue$:EventQueue = new EventQueue("formevents");
+
 	private static keys$:string[] =
 	[
 		'Tab',
@@ -129,7 +132,14 @@ export class Form implements ViewComponent
 
 	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
+		event.properties.set("block","block");
+		event.properties.set("field","field");
+
 		console.log("Form event "+event.type);
+
+		await EventQueue.DefaultEventQueue.getSlot();
+		BusinessEvents.send(event);
+
 		return(true);
 	}
 }
