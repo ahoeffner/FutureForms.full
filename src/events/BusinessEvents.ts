@@ -20,7 +20,6 @@
 */
 
 import { Class } from "../public/Class.js";
-import { EventQueue } from "./EventQueue.js";
 import { BusinessEvent } from "./BusinessEvent.js";
 import { Components } from "../view/Components.js";
 import { ViewComponent } from "../public/ViewComponent.js";
@@ -108,26 +107,31 @@ export class BusinessEvents implements EventListenerObject
 	 */
 	public static async send(event:BusinessEvent) : Promise<void>
 	{
+		let lsnrs:Listener[] = []; // Listeners
 		let chits:Listener[] = [];	// Component listener hits
 		let ahits:Listener[] = [];	// Component agnostic listener hits
 
 		let target:ViewComponent = Components.getViewComponent(event.component);
-		let lsnrs:Listener[] = this.producers$.get(target);
 
-		// Find all component listeners that match the event
-		if (lsnrs) for (let i = 0; i < lsnrs.length; i++)
+		if (target)
 		{
-			let ftype:Class<EventFilter> = lsnrs[i].filter.constructor as Class<EventFilter>;
+			lsnrs = this.producers$.get(target);
 
-			let comparator:FilterComparator = EventFilter.getComparator(ftype);
-			if (!comparator) comparator = EventFilter.DefaultComparator;
+			// Find all component listeners that match the event
+			if (lsnrs) for (let i = 0; i < lsnrs.length; i++)
+			{
+				let ftype:Class<EventFilter> = lsnrs[i].filter.constructor as Class<EventFilter>;
 
-			lsnrs[i].match = comparator(event,lsnrs[i].filter);
-			if (lsnrs[i].match >= 0) chits.push(lsnrs[i]);
+				let comparator:FilterComparator = EventFilter.getComparator(ftype);
+				if (!comparator) comparator = EventFilter.DefaultComparator;
+
+				lsnrs[i].match = comparator(event,lsnrs[i].filter);
+				if (lsnrs[i].match >= 0) chits.push(lsnrs[i]);
+			}
 		}
 
-		// Find non component listeners that match the event
-		if (target) lsnrs = this.producers$.get(null);
+		// Find component agnostic listeners that match the event
+		lsnrs = this.producers$.get(null);
 
 		if (lsnrs) for (let i = 0; i < lsnrs.length; i++)
 		{
@@ -141,8 +145,8 @@ export class BusinessEvents implements EventListenerObject
 		}
 
 		// Sort the listeners by match
-		chits = chits.sort((a,b) => a.match - b.match);
-		ahits = chits.sort((a,b) => a.match - b.match);
+		chits = chits?.sort((a,b) => a.match - b.match);
+		ahits = ahits?.sort((a,b) => a.match - b.match);
 
 		// Add no component listeners
 		lsnrs = chits.concat(ahits);

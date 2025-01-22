@@ -135,8 +135,6 @@ export class Form implements ViewComponent
 		event.properties.set("block","block");
 		event.properties.set("field","field");
 
-		console.log("Form event "+event.type);
-
 		await EventQueue.DefaultEventQueue.getSlot();
 		BusinessEvents.send(event);
 
