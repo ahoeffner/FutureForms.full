@@ -22,6 +22,18 @@
 import { BusinessEvent } from "./BusinessEvent.js";
 
 
+/** Function to receive events */
+export type EventHandler = (event:BusinessEvent) => Promise<boolean>;
+
+
+/** Destination that consists of the instance and the receiving method */
+export interface Destination
+{
+	component:any;
+	function:EventHandler;
+}
+
+
 /**
  * BusinessEvents are handled asyncronious allowing for comunication
  * with backend systems. Also, they are handled in an orderly manner, one by one
@@ -33,5 +45,11 @@ export interface BusinessEventListener
 	 * @param event Any BusinessEvent that was registered for
 	 * The return value indicates if the next listener should be invoked
 	 */
-	handleBusinessEvent?(event:BusinessEvent) : Promise<boolean>;
+	handleBusinessEvent:EventHandler;
+}
+
+
+export function isBusinessEventListener(object:any) : object is BusinessEventListener
+{
+	return(object && typeof object.handleBusinessEvent === "function")
 }

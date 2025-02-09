@@ -24,7 +24,7 @@ import { BusinessEvent } from "./BusinessEvent.js";
 import { Components } from "../view/Components.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 import { EventFilter, FilterComparator } from "./EventFilter.js";
-import { BusinessEventListener } from "./BusinessEventListener.js";
+import { BusinessEventListener, Destination, isBusinessEventListener } from "./BusinessEventListener.js";
 
 
 export class BusinessEvents implements EventListenerObject
@@ -155,7 +155,7 @@ export class BusinessEvents implements EventListenerObject
 		{
 			try
 			{
-				if (!await lsnrs[i].listener.handleBusinessEvent(event))
+				if (!await this.invoke(lsnrs[i].destination,event))
 					break;
 			}
 			catch (error) {break;}
@@ -230,6 +230,29 @@ export class BusinessEvents implements EventListenerObject
 			}
 		}
    }
+
+
+	private static async invoke(destination:Destination, event:BusinessEvent) : Promise<boolean>
+	{
+		let success:boolean = false;
+
+		if (destination.component)
+		{
+			if (isBusinessEventListener(destination.component))
+			{
+				success = await destination.component.handleBusinessEvent(event);
+			}
+			else if (destination.function)
+			{
+				success = await destination.function(event);
+			}
+		}
+
+		if (success == null)
+			success = false;
+
+		return(success);
+	}
 }
 
 
@@ -275,11 +298,14 @@ class Listener
 {
 	public match:number = 0;
 	public filter:EventFilter = null;
-	public listener:BusinessEventListener = null;
+	public destination:Destination = null;
 
-	constructor(listener:BusinessEventListener, filter:EventFilter)
+	constructor(listener:Destination|BusinessEventListener, filter:EventFilter)
 	{
-		this.listener = listener;
+		if (isBusinessEventListener(listener))
+			listener = {component: listener, function: listener.handleBusinessEvent}
+
 		this.filter = filter;
+		this.destination = listener;
 	}
 }
