@@ -58,7 +58,7 @@ export class FormEventFilter extends EventFilter
 		EventFilter.register(FormEventFilter,FormEventComparator);
 	}
 
-	constructor(component:Form|string, type:string, public block?:string, public field?:string)
+	constructor(component:Form|string, type?:string, public block?:string, public field?:string)
 	{
 		super();
 		this.type = type;

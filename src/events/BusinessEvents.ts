@@ -279,7 +279,6 @@ class TriggerComponent
 	public getComponents(view:HTMLElement) : ViewComponent[]
 	{
 		let list:ViewComponent[] = [];
-
 		let comp:ViewComponent = Components.findViewComponent(view);
 
 		while (comp)

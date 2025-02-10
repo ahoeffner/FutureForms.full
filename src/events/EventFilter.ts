@@ -61,7 +61,7 @@ export class EventFilter
 	{
 		let match:number = 0;
 
-		if (event.type)
+		if (filter.type)
 		{
 			if (event.type != filter.type)
 				return(-1);
@@ -69,7 +69,7 @@ export class EventFilter
 			match++;
 		}
 
-		if (event.component)
+		if (filter.component)
 		{
 			if (typeof filter.component === "string")
 			{
