@@ -29,7 +29,7 @@ export { FormsModule } from './src/public/FormsModule.js';
 export { EventQueue } from './src/events/EventQueue.js';
 export { BusinessEvent } from './src/events/BusinessEvent.js';
 export { BusinessEvents } from './src/events/BusinessEvents.js';
-export { BusinessEventListener } from './src/events/BusinessEventListener.js';
+export { BusinessEventListener, Destination } from './src/events/BusinessEventListener.js';
 
 export { FormEventFilter } from './src/events/FormEvent.js';
 

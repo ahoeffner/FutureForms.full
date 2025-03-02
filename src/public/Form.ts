@@ -22,6 +22,9 @@
 
 import { Form as View} from "../view/Form.js";
 import { Form as Model} from "../model/Form.js";
+import { FormEventFilter } from "../events/FormEvent.js";
+import { BusinessEvents, Listener } from "../events/BusinessEvents.js";
+import { Destination, EventHandler } from "../events/BusinessEventListener.js";
 
 
 export class Form
@@ -57,5 +60,25 @@ export class Form
 	public getView() : HTMLElement
 	{
 		return(this.view$.getView());
+	}
+
+
+	public addTrigger(destination:EventHandler|Destination|any, filter:FormEventFilter) : Listener
+	{
+		if (destination == null)
+			destination = {component:this, function:null};
+
+		else
+
+		if (typeof destination === "function")
+			destination = {component:this, function:destination};
+
+		if (!destination["component"] && !destination["function"])
+			destination = {component:destination, function:null};
+
+		if (!destination["component"])
+			destination["component"] = this;
+
+		return(BusinessEvents.addListener(destination,filter));
 	}
 }

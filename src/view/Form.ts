@@ -132,8 +132,8 @@ export class Form implements ViewComponent
 
 	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
-		event.properties.set("block","block");
-		event.properties.set("field","field");
+		event.properties.set("field",event.target.getAttribute("name"));
+		event.properties.set("source",event.target.getAttribute("source"));
 
 		await EventQueue.DefaultEventQueue.getSlot();
 		BusinessEvents.send(event);

@@ -31,9 +31,9 @@ const FormEventComparator:FilterComparator = (event:BusinessEvent, filter:FormEv
 	if (EventFilter.DefaultComparator(event,filter) < 0)
 		return(-1);
 
-	if (filter.block)
+	if (filter.source)
 	{
-		if (filter.block != event.properties.get("block"))
+		if (filter.source != event.properties.get("source"))
 			return(-1);
 
 		match++;
@@ -58,7 +58,7 @@ export class FormEventFilter extends EventFilter
 		EventFilter.register(FormEventFilter,FormEventComparator);
 	}
 
-	constructor(component:Form|string, type?:string, public block?:string, public field?:string)
+	constructor(component:Form|string, type?:string, public source?:string, public field?:string)
 	{
 		super();
 		this.type = type;

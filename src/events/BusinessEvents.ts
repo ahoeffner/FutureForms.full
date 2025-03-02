@@ -84,20 +84,29 @@ export class BusinessEvents implements EventListenerObject
 	 * @param comp The class to receive events
 	 * @param target The class that raise events
 	 */
-	public static async addListener(comp:BusinessEventListener, filter?:EventFilter) : Promise<void>
+	public static addListener(comp:Destination|BusinessEventListener, filter?:EventFilter) : Listener
 	{
+		let listener:Listener = null;
+
 		if (filter.component && typeof filter.component !== "string")
 		{
 			let target = Components.getViewComponent(filter.component);
 			let lsnrs:Listener[] = this.producers$.get(target);
-			if (lsnrs) lsnrs.push(new Listener(comp,filter));
+			if (lsnrs)
+			{
+				listener = new Listener(comp,filter);
+				lsnrs.push(listener);
+			}
 		}
 		else
 		{
 			let lsnrs:Listener[] = this.producers$.get(null);
 			if (!lsnrs) {lsnrs = []; this.producers$.set(null,lsnrs);}
-			lsnrs.push(new Listener(comp,filter));
+			listener = new Listener(comp,filter);
+			lsnrs.push(listener);
 		}
+
+		return(listener);
 	}
 
 
@@ -145,8 +154,8 @@ export class BusinessEvents implements EventListenerObject
 		}
 
 		// Sort the listeners by match
-		chits = chits?.sort((a,b) => a.match - b.match);
-		ahits = ahits?.sort((a,b) => a.match - b.match);
+		chits = chits?.sort((a,b) => b.match - a.match);
+		ahits = ahits?.sort((a,b) => b.match - a.match);
 
 		// Add no component listeners
 		lsnrs = chits.concat(ahits);
@@ -238,13 +247,17 @@ export class BusinessEvents implements EventListenerObject
 
 		if (destination.component)
 		{
+			if (destination.function)
+			{
+				let func:string = destination.function.name;
+				success = await destination.component[func](event);
+			}
+
+			else
+
 			if (isBusinessEventListener(destination.component))
 			{
 				success = await destination.component.handleBusinessEvent(event);
-			}
-			else if (destination.function)
-			{
-				success = await destination.function(event);
 			}
 		}
 
@@ -293,7 +306,7 @@ class TriggerComponent
 }
 
 
-class Listener
+export class Listener
 {
 	public match:number = 0;
 	public filter:EventFilter = null;
@@ -303,6 +316,11 @@ class Listener
 	{
 		if (isBusinessEventListener(listener))
 			listener = {component: listener, function: listener.handleBusinessEvent}
+
+		else
+
+		if (!listener.function)
+			listener.function = listener.component["handleBusinessEvent"];
 
 		this.filter = filter;
 		this.destination = listener;
