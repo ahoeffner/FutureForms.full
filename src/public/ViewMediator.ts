@@ -20,6 +20,16 @@
 */
 
 
+/**
+ * ViewMediator is a singleton class that manages all aspects of the view layer.
+ * It is responsible for bringing elements to the front, blocking and unblocking elements,
+ * and managing getting and setting values and attributes on elements.
+ *
+ * To use a different implementation of ViewMediator, set the static impl property.
+ * Then override the methods as needed.
+ *
+ * The default implementation is an instance of ViewMediator itself.
+ */
 export class ViewMediator
 {
 	public static zindex:number = 1;
@@ -34,6 +44,73 @@ export class ViewMediator
 	public static set impl(mediator:ViewMediator)
 	{
 		ViewMediator.current$ = mediator;
+	}
+
+
+	public getValue(element:HTMLElement) : string
+	{
+		if (element instanceof HTMLInputElement)
+		{
+			if (element.type == "checkbox" || element.type == "radio")
+				return(element.checked ? "true" : "false");
+			else
+				return(element.value);
+		}
+
+		else if (element instanceof HTMLSelectElement)
+		{
+			if (element.multiple)
+			{
+				let values:string[] = [];
+				for (let option of element.options)
+				{
+					if (option.selected)
+						values.push(option.value);
+				}
+				return(values.join(","));
+			}
+			else
+			{
+				return(element.value);
+			}
+		}
+
+		else if (element instanceof HTMLTextAreaElement)
+		{
+			return(element.value);
+		}
+
+		else if (element instanceof HTMLButtonElement)
+		{
+			return(element.textContent || "");
+		}
+
+		else if (element instanceof HTMLLabelElement)
+		{
+			return(element.textContent || "");
+		}
+
+		else if (element instanceof HTMLDivElement || element instanceof HTMLSpanElement)
+		{
+			return(element.textContent || "");
+		}
+		else if (element instanceof HTMLAnchorElement)
+		{
+			return(element.textContent || "");
+		}
+
+		else if (element instanceof HTMLImageElement)
+		{
+			return(element.alt || "");
+		}
+
+		else if (element instanceof HTMLObjectElement)
+		{
+			if (element.data)
+				return(element.data);
+			else if (element.getAttribute("data"))
+				return(element.getAttribute("data") || "");
+		}
 	}
 
 

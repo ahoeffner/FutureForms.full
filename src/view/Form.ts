@@ -132,8 +132,33 @@ export class Form implements ViewComponent
 
 	public async propagateBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
-		event.properties.set("field",event.target.getAttribute("name"));
-		event.properties.set("source",event.target.getAttribute("source"));
+		let row = +event.target.getAttribute("row");
+		let field = event.target.getAttribute("name");
+		let source = event.target.getAttribute("source");
+
+		if (field && source)
+		{
+			if ((!row || isNaN(row)))
+				row = -1;
+		}
+
+		event.properties.set("row",row);
+		event.properties.set("field",field);
+		event.properties.set("source",source);
+
+		console.log("Form event "+event.type+" "+this.form$.name+" row="+row+" field="+field+" source="+source);
+
+		//if (event.type == "leave")
+			//console.log("leave");
+
+		if (event.type == "input")
+			console.log("input",ViewMediator.impl.getValue(event.target));
+
+		//else if (event.type == "focus")
+			//console.log("Form event "+event.type+" "+this.form$.name+" "+event.target.getAttribute("name"));
+
+		//else
+			//console.log("Form event "+event.type+" "+this.form$.name+" "+event.target.getAttribute("name")+" "+event.target.getAttribute("source"));
 
 		await EventQueue.DefaultEventQueue.getSlot();
 		BusinessEvents.send(event);
