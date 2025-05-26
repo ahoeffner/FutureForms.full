@@ -130,7 +130,7 @@ export class Form implements ViewComponent
    }
 
 
-	public async consumeBusinessEvent(event:BusinessEvent) : Promise<boolean>
+	public async propagateBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
 		event.properties.set("field",event.target.getAttribute("name"));
 		event.properties.set("source",event.target.getAttribute("source"));

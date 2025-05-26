@@ -30,7 +30,7 @@ export interface ViewComponent
 	resume() : void;
 	getView() : HTMLElement;
 	setView(view:HTMLElement) : Promise<void>
-	consumeBusinessEvent(event:BusinessEvent) : Promise<boolean>
+	propagateBusinessEvent(event:BusinessEvent) : Promise<boolean>
 }
 
 

@@ -22,9 +22,9 @@
 import { Class } from "../public/Class.js";
 import { BusinessEvent } from "./BusinessEvent.js";
 import { Components } from "../view/Components.js";
+import { Destination, isBusinessEventListener } from "./BusinessEventListener.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 import { EventFilter, FilterComparator } from "./EventFilter.js";
-import { BusinessEventListener, Destination, isBusinessEventListener } from "./BusinessEventListener.js";
 
 
 export class BusinessEvents implements EventListenerObject
@@ -84,7 +84,7 @@ export class BusinessEvents implements EventListenerObject
 	 * @param comp The class to receive events
 	 * @param target The class that raise events
 	 */
-	public static addListener(comp:Destination|BusinessEventListener, filter?:EventFilter) : Listener
+	public static addListener(comp:Destination, filter?:EventFilter) : Listener
 	{
 		let listener:Listener = null;
 
@@ -202,7 +202,7 @@ export class BusinessEvents implements EventListenerObject
 							{
 								comp = Components.getComponent(prev[i]);
 								bevent = new BusinessEvent("leave",comp,trg.elem);
-								prev[i].consumeBusinessEvent(bevent);
+								prev[i].propagateBusinessEvent(bevent);
 							}
 						}
 					}
@@ -215,7 +215,7 @@ export class BusinessEvents implements EventListenerObject
 							{
 								comp = Components.getComponent(next[i]);
 								bevent = new BusinessEvent("enter",comp,trg.elem);
-								next[i].consumeBusinessEvent(bevent);
+								next[i].propagateBusinessEvent(bevent);
 							}
 						}
 					}
@@ -226,7 +226,7 @@ export class BusinessEvents implements EventListenerObject
 				if (trg.vcomp && event.type == "focusin")
 				{
 					bevent = new BusinessEvent("focus",trg.comp,trg.elem);
-					trg.vcomp.consumeBusinessEvent(bevent)
+					trg.vcomp.propagateBusinessEvent(bevent)
 				}
 			}
 
@@ -235,7 +235,7 @@ export class BusinessEvents implements EventListenerObject
 			if (trg.vcomp)
 			{
 				bevent = new BusinessEvent(event.type,trg.comp,trg.elem);
-				trg.vcomp.consumeBusinessEvent(bevent)
+				trg.vcomp.propagateBusinessEvent(bevent)
 			}
 		}
    }
@@ -245,20 +245,10 @@ export class BusinessEvents implements EventListenerObject
 	{
 		let success:boolean = false;
 
-		if (destination.component)
+		if (destination.component && destination.function)
 		{
-			if (destination.function)
-			{
-				let func:string = destination.function.name;
-				success = await destination.component[func](event);
-			}
-
-			else
-
-			if (isBusinessEventListener(destination.component))
-			{
-				success = await destination.component.handleBusinessEvent(event);
-			}
+			let func:string = destination.function.name;
+			success = await destination.component[func](event);
 		}
 
 		if (success == null)
@@ -312,17 +302,15 @@ export class Listener
 	public filter:EventFilter = null;
 	public destination:Destination = null;
 
-	constructor(listener:Destination|BusinessEventListener, filter:EventFilter)
+	constructor(destination:Destination, filter:EventFilter)
 	{
-		if (isBusinessEventListener(listener))
-			listener = {component: listener, function: listener.handleBusinessEvent}
-
-		else
-
-		if (!listener.function)
-			listener.function = listener.component["handleBusinessEvent"];
-
 		this.filter = filter;
-		this.destination = listener;
+		this.destination = destination;
+
+		if (!destination.function)
+		{
+			if (isBusinessEventListener(destination.component))
+				this.destination.function = destination.component.handleBusinessEvent;
+		}
 	}
 }
