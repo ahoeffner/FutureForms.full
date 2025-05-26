@@ -19,10 +19,10 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { BusinessEventListener } from "../events/BusinessEventListener.js";
+import { BusinessEvent } from "../events/BusinessEvent.js";
 
 
-export interface ViewComponent extends BusinessEventListener
+export interface ViewComponent
 {
 	parent:ViewComponent;
 
@@ -30,6 +30,7 @@ export interface ViewComponent extends BusinessEventListener
 	resume() : void;
 	getView() : HTMLElement;
 	setView(view:HTMLElement) : Promise<void>
+	consumeBusinessEvent(event:BusinessEvent) : Promise<boolean>
 }
 
 

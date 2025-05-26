@@ -202,7 +202,7 @@ export class BusinessEvents implements EventListenerObject
 							{
 								comp = Components.getComponent(prev[i]);
 								bevent = new BusinessEvent("leave",comp,trg.elem);
-								prev[i].handleBusinessEvent(bevent);
+								prev[i].consumeBusinessEvent(bevent);
 							}
 						}
 					}
@@ -215,7 +215,7 @@ export class BusinessEvents implements EventListenerObject
 							{
 								comp = Components.getComponent(next[i]);
 								bevent = new BusinessEvent("enter",comp,trg.elem);
-								next[i].handleBusinessEvent(bevent);
+								next[i].consumeBusinessEvent(bevent);
 							}
 						}
 					}
@@ -226,7 +226,7 @@ export class BusinessEvents implements EventListenerObject
 				if (trg.vcomp && event.type == "focusin")
 				{
 					bevent = new BusinessEvent("focus",trg.comp,trg.elem);
-					trg.vcomp.handleBusinessEvent(bevent)
+					trg.vcomp.consumeBusinessEvent(bevent)
 				}
 			}
 
@@ -235,7 +235,7 @@ export class BusinessEvents implements EventListenerObject
 			if (trg.vcomp)
 			{
 				bevent = new BusinessEvent(event.type,trg.comp,trg.elem);
-				trg.vcomp.handleBusinessEvent(bevent)
+				trg.vcomp.consumeBusinessEvent(bevent)
 			}
 		}
    }

@@ -124,7 +124,7 @@ export class Window implements ViewComponent
 	}
 
 
-	public async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
+	public async consumeBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
 		console.log("Window event "+event.type);
 
