@@ -47,38 +47,16 @@ export class ViewMediator
 	}
 
 
-	public getValue(element:HTMLElement) : string
+	public getValue(element:HTMLElement) : any
 	{
 		if (element instanceof HTMLInputElement)
-		{
-			if (element.type == "checkbox" || element.type == "radio")
-				return(element.checked ? "true" : "false");
-			else
-				return(element.value);
-		}
+			return(this.getInputValue(element));
 
 		else if (element instanceof HTMLSelectElement)
-		{
-			if (element.multiple)
-			{
-				let values:string[] = [];
-				for (let option of element.options)
-				{
-					if (option.selected)
-						values.push(option.value);
-				}
-				return(values.join(","));
-			}
-			else
-			{
-				return(element.value);
-			}
-		}
+			return(this.getSelectValue(element));
 
 		else if (element instanceof HTMLTextAreaElement)
-		{
-			return(element.value);
-		}
+			return(this.getTextAreaValue(element));
 
 		else if (element instanceof HTMLButtonElement)
 		{
@@ -111,6 +89,256 @@ export class ViewMediator
 			else if (element.getAttribute("data"))
 				return(element.getAttribute("data") || "");
 		}
+	}
+
+
+	getDateValue(element:HTMLInputElement) : Date
+	{
+		let date:Date = new Date(element.value);
+		date.setHours(0, 0, 0, 0);
+		return(date);
+	}
+
+
+	getDateTimeValue(element:HTMLInputElement) : Date
+	{
+		return(new Date(element.value));
+	}
+
+
+	public getTextAreaValue(element:HTMLTextAreaElement) : string
+	{
+		if (element instanceof HTMLTextAreaElement)
+			return(element.value);
+
+		return(null);
+	}
+
+
+	public getInputValue(element:HTMLInputElement) : any
+	{
+		if (element instanceof HTMLInputElement)
+		{
+			if (element.type == "number")
+				return(this.getNumberValue(element));
+
+			if (element.type == "range")
+				return(this.getRangeValue(element));
+
+			if (element.type == "radio")
+				return(this.getRadioValue(element));
+
+			if (element.type == "checkbox")
+				return(this.getCheckBoxValue(element));
+
+			if (element.type == "datetime-local" || element.type == "time")
+				return(this.getDateTimeValue(element));
+
+			if (element.type == "date" || element.type == "month" || element.type == "week")
+				return(this.getDateValue(element));
+
+			return(element.value);
+		}
+	}
+
+
+	public getNumberValue(element:HTMLInputElement) : number
+	{
+		let num:number = parseFloat(element.value);
+		if (isNaN(num)) return(null); else return(num);
+	}
+
+
+	public getRangeValue(element:HTMLInputElement) : number
+	{
+		let num:number = parseFloat(element.value);
+		if (isNaN(num)) return(null); else return(num);
+	}
+
+
+	public getRadioValue(element:HTMLInputElement) : string
+	{
+		if (element.type == "radio")
+		{
+			let group:string = element.name;
+			let radios:NodeListOf<HTMLInputElement> = document.querySelectorAll(`input[type="radio"][name="${group}"]`);
+
+			for (let radio of radios)
+			{
+				if (radio.checked)
+					return(radio.value);
+			}
+		}
+
+		return(null);
+	}
+
+
+	public getCheckBoxValue(element:HTMLInputElement) : boolean
+	{
+		if (element.type == "checkbox")
+			return(element.checked);
+	}
+
+
+	public getSelectValue(element:HTMLSelectElement) : string
+	{
+		if (element.multiple)
+		{
+			let values:string[] = [];
+			for (let option of element.options)
+			{
+				if (option.selected)
+					values.push(option.value);
+			}
+			return(values.join(","));
+		}
+		else
+		{
+			return(element.value);
+		}
+	}
+
+
+	public setValue(element:HTMLElement, value:any) : void
+	{
+		if (element instanceof HTMLInputElement)
+			return(this.setInputValue(element, value));
+
+		if (element instanceof HTMLSelectElement)
+			return(this.setSelectValue(element, value));
+
+		if (element instanceof HTMLTextAreaElement)
+			return(this.setTextAreaValue(element, value));
+
+		if (element instanceof HTMLButtonElement || element instanceof HTMLLabelElement ||
+				 element instanceof HTMLDivElement || element instanceof HTMLSpanElement ||
+				 element instanceof HTMLAnchorElement)
+		{
+			element.textContent = value;
+			return;
+		}
+
+		if (element instanceof HTMLImageElement)
+		{
+			element.alt = value;
+			return;
+		}
+
+		if (element instanceof HTMLObjectElement)
+		{
+			if (element.data) element.data = value;
+			else	element.setAttribute("data",value);
+		}
+	}
+
+
+	public setInputValue(element:HTMLInputElement, value:any) : void
+	{
+		if (element instanceof HTMLInputElement)
+		{
+			if (element.type == "number")
+			 return(this.setNumberValue(element, value));
+
+			if (element.type == "range")
+			 return(this.setRangeValue(element, value));
+
+			if (element.type == "radio")
+				return(this.setRadioValue(element, value));
+
+			if (element.type == "checkbox")
+				return(this.setCheckBoxValue(element, value));
+
+			if (element.type == "time" || element.type == "datetime" || element.type == "datetime-local")
+				return(this.setDateTimeValue(element, value));
+
+			if (element.type == "Date" ||	element.type == "month" || element.type == "week")
+				return(this.setDateValue(element, value));
+
+			element.value = value;
+		}
+	}
+
+
+	public setNumberValue(element:HTMLInputElement, value:number) : void
+	{
+		if (!isNaN(value))
+			element.value = value.toString();
+	}
+
+
+	public setRangeValue(element:HTMLInputElement, value:number) : void
+	{
+		if (!isNaN(value))
+			element.value = value.toString();
+	}
+
+
+	public setRadioValue(element:HTMLInputElement, value:boolean) : void
+	{
+		element.checked = value;
+	}
+
+
+	public setTextAreaValue(element:HTMLTextAreaElement, value:string) : void
+	{
+		element.value = value;
+	}
+
+
+	public setCheckBoxValue(element:HTMLInputElement, value:boolean) : void
+	{
+		element.checked = value;
+	}
+
+
+	public setSelectValue(element:HTMLSelectElement, value:string) : void
+	{
+		if (element.multiple)
+		{
+			let values:string[] = value.split(",");
+			for (let option of element.options)
+			{
+				option.selected = values.includes(option.value);
+			}
+		}
+		else
+		{
+			element.value = value;
+		}
+	}
+
+
+	public setDateValue(element:HTMLInputElement, date:Date) : void
+	{
+		element.value = this.formatDate(date);
+	}
+
+
+	public setDateTimeValue(element:HTMLInputElement, date:Date) : void
+	{
+		element.value = this.formatDateTime(date);
+ 	}
+
+
+	public formatDate(date:Date) : string
+	{
+		let day:string = date.getDate().toString().padStart(2, '0');
+		let month:string = (date.getMonth() + 1).toString().padStart(2, '0');
+		let year:string = date.getFullYear().toString();
+		return(`${day}-${month}-${year}`);
+	}
+
+
+	public formatDateTime(date:Date) : string
+	{
+		let day:string = date.getDate().toString().padStart(2, '0');
+		let month:string = (date.getMonth() + 1).toString().padStart(2, '0');
+		let year:string = date.getFullYear().toString();
+		let hours:string = date.getHours().toString().padStart(2, '0');
+		let minutes:string = date.getMinutes().toString().padStart(2, '0');
+		let seconds:string = date.getSeconds().toString().padStart(2, '0');
+		return(`${day}-${month}-${year}  ${hours}:${minutes}:${seconds}`);
 	}
 
 

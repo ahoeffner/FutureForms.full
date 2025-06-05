@@ -154,6 +154,8 @@ export class Form implements ViewComponent
 		if (event.type == "input")
 			console.log("input",ViewMediator.impl.getValue(event.target));
 
+		
+
 		//else if (event.type == "focus")
 			//console.log("Form event "+event.type+" "+this.form$.name+" "+event.target.getAttribute("name"));
 
