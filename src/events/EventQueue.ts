@@ -29,7 +29,7 @@ export class EventQueue
 {
 	private name$:string = null;
 	private queue$:Resolve<any>[] = [];
-	
+
 	public static DefaultEventQueue:EventQueue = new EventQueue("default");
 
 
@@ -79,7 +79,7 @@ export class EventQueue
 		let slot:Promise<T> = new Promise((resolve) =>
 		{
 			this.queue$.push(resolve);
-			setTimeout(() => {this.check(resolve,payload)},100);
+			setTimeout(() => {this.check(resolve,payload)},10);
 		});
 
 		return(slot);
@@ -104,6 +104,6 @@ export class EventQueue
 		}
 
 		// Try again later
-		setTimeout(() => {this.check(resolve,payload)},1000);
+		setTimeout(() => {this.check(resolve,payload)},100);
 	}
 }

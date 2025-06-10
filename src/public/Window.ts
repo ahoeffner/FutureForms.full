@@ -19,7 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Window as View } from "../view/Window.js";
+import { Window as View } from "../components/Window.js";
 
 
 export class Window

@@ -23,48 +23,20 @@
 import { Parser } from "./Parser.js";
 import { Components } from "./Components.js";
 import { Form as Parent } from "../public/Form.js";
-import { Form as ModelForm } from "../model/Form.js";
+import { EventQueue } from "../events/EventQueue.js";
 import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 import { BusinessEvent } from "../events/BusinessEvent.js";
 import { BusinessEvents } from "../events/BusinessEvents.js";
-import { EventQueue } from "../events/EventQueue.js";
 
 
 /**
- * This class handles all view and user interaction related stuff.
- * It has links to the public interface as well as the model.
- * The class is not exposed to the end developer
+ * This class handles the ViewComponent related stuff.
+ * The class forms/view/Forms inherits from this and handles the form logic.
  */
 export class Form implements ViewComponent
 {
-	private static queue$:EventQueue = new EventQueue("formevents");
-
-	private static keys$:string[] =
-	[
-		'Tab',
-		'Enter',
-		'Escape',
-		'PageUp',
-		'PageDown',
-		'ArrowUp',
-		'ArrowDown',
-		'F1',
-		'F2',
-		'F3',
-		'F4',
-		'F5',
-		'F6',
-		'F7',
-		'F8',
-		'F9',
-		'F10',
-		'F11',
-		'F12'
-	];
-
 	private form$:Parent = null;
-	private model$:ModelForm = null;
 	private view$:HTMLElement = null;
 	private parent$:ViewComponent = null;
 
@@ -91,16 +63,6 @@ export class Form implements ViewComponent
 		this.parent$ = parent;
 	}
 
-	public get model() : ModelForm
-	{
-		return(this.model$);
-	}
-
-	public set model(form:ModelForm)
-	{
-		this.model$ = form;
-	}
-
 	public pause() : void
 	{
 		ViewMediator.impl.block(this.view$);
@@ -125,7 +87,6 @@ export class Form implements ViewComponent
       await parser.parse(view);
 
 		this.view$ = view;
-
 		Components.add(this);
    }
 
@@ -133,8 +94,8 @@ export class Form implements ViewComponent
 	public async propagateBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
 		let row = +event.target.getAttribute("row");
-		let field = event.target.getAttribute("name");
-		let source = event.target.getAttribute("source");
+		let field = event.target.getAttribute("name")?.toLocaleLowerCase();
+		let source = event.target.getAttribute("source")?.toLocaleLowerCase();
 
 		if (field && source)
 		{
@@ -146,15 +107,15 @@ export class Form implements ViewComponent
 		event.properties.set("field",field);
 		event.properties.set("source",source);
 
-		console.log("Form event "+event.type+" "+this.form$.name+" row="+row+" field="+field+" source="+source);
+		//console.log("Form event "+event.type+" "+this.form$.name+" row="+row+" field="+field+" source="+source);
 
 		//if (event.type == "leave")
 			//console.log("leave");
 
-		if (event.type == "input")
-			console.log("input",ViewMediator.impl.getValue(event.target));
+		//if (event.type == "input")
+			//console.log("input",ViewMediator.impl.getValue(event.target));
 
-		
+
 
 		//else if (event.type == "focus")
 			//console.log("Form event "+event.type+" "+this.form$.name+" "+event.target.getAttribute("name"));

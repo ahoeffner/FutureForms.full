@@ -19,6 +19,10 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+
+/**
+ * This is the base definition for Custom tags.
+ */
 export abstract class Tag
 {
 	public abstract identifier:string;

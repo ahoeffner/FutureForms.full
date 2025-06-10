@@ -21,7 +21,7 @@
 
 import { Class } from "../public/Class.js";
 import { BusinessEvent } from "./BusinessEvent.js";
-import { Components } from "../view/Components.js";
+import { Components } from "../components/Components.js";
 import { Destination, isBusinessEventListener } from "./BusinessEventListener.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 import { EventFilter, FilterComparator } from "./EventFilter.js";

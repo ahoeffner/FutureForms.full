@@ -20,7 +20,6 @@
 */
 
 import { Tag } from "./Tag.js";
-import { From } from "./From.js";
 import { Foreach } from "./Foreach.js";
 import { Component } from "./Component.js";
 import { Class } from '../../public/Class.js';
@@ -37,7 +36,6 @@ export class TagLibrary
     */
    private static inittags() : Map<string,Class<Tag>>
    {
-      //let tag:Tag = null;
       let tags:Map<string,Class<Tag>> = new Map<string,Class<Tag>>();
       return(tags);
    }
@@ -50,9 +48,6 @@ export class TagLibrary
    {
       let tag:Tag = null;
       let tags:Map<string,Class<Tag>> = new Map<string,Class<Tag>>();
-
-      tag = new From();
-      tags.set(tag.identifier?.toLowerCase(),From);
 
       tag = new Foreach();
       tags.set(tag.identifier?.toLowerCase(),Foreach);

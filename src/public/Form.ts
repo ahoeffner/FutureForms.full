@@ -20,8 +20,8 @@
 */
 
 
-import { Form as View} from "../view/Form.js";
-import { Form as Model} from "../model/Form.js";
+import { Form as View} from "../forms/view/Form.js";
+import { Form as Model} from "../forms/model/Form.js";
 import { FormEventFilter } from "../events/FormEvent.js";
 import { BusinessEvents, Listener } from "../events/BusinessEvents.js";
 import { Destination, EventHandler } from "../events/BusinessEventListener.js";

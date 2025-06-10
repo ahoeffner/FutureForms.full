@@ -21,8 +21,8 @@
 
 import { Tag } from './tags/Tag.js';
 import { Class } from '../public/Class.js';
+import { Component } from './tags/Component.js';
 import { TagLibrary } from './tags/TagLibrary.js';
-import { ComponentTag } from './tags/ComponentTag.js';
 
 
 export class Parser
@@ -150,7 +150,7 @@ export class Parser
 
       if (tag != null)
       {
-         if (tag instanceof ComponentTag)
+         if (tag instanceof Component)
 				return(await this.consume(clazz,tag,element,null));
 
          replace = await this.getTagReplacement(clazz,tag,element,null,skip);
@@ -169,7 +169,7 @@ export class Parser
 
          if (tag != null)
          {
-				if (tag instanceof ComponentTag)
+				if (tag instanceof Component)
 					return(await this.consume(clazz,tag,element,attr));
 
             replace = await this.getTagReplacement(clazz,tag,element,attr,skip);
@@ -238,7 +238,7 @@ export class Parser
    }
 
 
-   private async consume(clazz:Class<Tag>, tag:ComponentTag, element:Node, attr:string) : Promise<boolean>
+   private async consume(clazz:Class<Tag>, tag:Component, element:Node, attr:string) : Promise<boolean>
    {
       let comp:any = tag.consume(element as HTMLElement,attr);
       if (comp instanceof Promise) comp = await comp;

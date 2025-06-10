@@ -15,10 +15,10 @@ export { Record, RecordDefinition } from 'futureforms';
 export { Filter, Filters, NameValuePair } from 'futureforms';
 
 
-export { Tag } from './src/view/tags/Tag.js';
-export { Parser } from './src/view/Parser.js';
-export { TagLibrary } from './src/view/tags/TagLibrary.js';
-export { ComponentTag } from './src/view/tags/ComponentTag.js';
+export { Tag } from './src/components/tags/Tag.js';
+export { Parser } from './src/components/Parser.js';
+export { Component } from './src/components/tags/Component.js';
+export { TagLibrary } from './src/components/tags/TagLibrary.js';
 
 export { Form } from './src/public/Form.js';
 export { Window } from './src/public/Window.js';
@@ -33,4 +33,4 @@ export { BusinessEventListener, Destination } from './src/events/BusinessEventLi
 
 export { FormEventFilter } from './src/events/FormEvent.js';
 
-export { Source } from './src/model/Source.js';
+export { Source } from './src/forms/model/Source.js';

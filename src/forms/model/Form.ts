@@ -19,14 +19,38 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Tag } from "./Tag.js";
+import { Form as Parent } from '../../public/Form.js';
+import { Form as ViewForm } from '../../components/Form.js';
 
-export abstract class ComponentTag extends Tag
+
+/**
+ * This class handles all model related stuff.
+ * It has links to the public interface as well as the view.
+ * The class is not exposed to the end developer
+ */
+export class Form
 {
-	public abstract consume(element:HTMLElement, attr?:string) : any|Promise<any>;
+	private parent$:Parent = null;
+	private view$:ViewForm = null;
 
-   public replace(_element: HTMLElement, _attr?: string) : HTMLElement
-   {
-      throw new Error("Method not implemented.");
-   }
+
+	constructor(parent:Parent)
+	{
+		this.parent$ = parent;
+	}
+
+	public get parent() : Parent
+	{
+		return(this.parent$);
+	}
+
+	public get view() : ViewForm
+	{
+		return(this.view$);
+	}
+
+	public set view(form:ViewForm)
+	{
+		this.view$ = form;
+	}
 }

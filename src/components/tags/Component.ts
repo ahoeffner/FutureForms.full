@@ -19,39 +19,28 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { ComponentTag } from "./ComponentTag.js";
+import { Tag } from "./Tag.js";
+import { Components } from "../../public/Components.js";
+import { Properties } from "../../public/Properties.js";
 
 
-export class From extends ComponentTag
+/**
+ * This tag will construct a Component and subsequently consume the element body
+ */
+export class Component extends Tag
 {
-	public identifier:string = "from";
+	public identifier:string = Properties.tags.component;
 
-   public consume(element:HTMLElement, attr:string) : Binding
+	public async consume(element:HTMLElement, attr:string): Promise<boolean>
+	{
+		let name:string = element.getAttribute(attr);
+   	let comp:any = await Components.create(name,element);
+   	return(comp);
+	}
+
+
+	public replace(_element: HTMLElement, _attr?: string) : HTMLElement
    {
-      return(new Binding(element,element.getAttribute(attr)));
-   }
-}
-
-
-export class Binding
-{
-   private source$:string;
-   private element$:HTMLElement;
-
-   constructor(element:HTMLElement, source:string)
-   {
-      this.source$ = source;
-      this.element$ = element;
-   }
-
-   public get source() : string
-   {
-      return(this.source$);
-   }
-
-
-   public get element() : HTMLElement
-   {
-      return(this.element$);
+      throw new Error("Components consume the element body, so this method should not be called.");
    }
 }
