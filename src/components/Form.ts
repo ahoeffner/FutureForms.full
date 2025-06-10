@@ -107,25 +107,26 @@ export class Form implements ViewComponent
 		event.properties.set("field",field);
 		event.properties.set("source",source);
 
-		//console.log("Form event "+event.type+" "+this.form$.name+" row="+row+" field="+field+" source="+source);
+		try
+		{
+			await EventQueue.DefaultEventQueue.getSlot();
+			await this.handleBusinessEvent(event);
+			return(true);
+		}
+		catch (error)
+		{
+			console.error("Error handling business event:", error);
+			return(false);
+		}
+	}
 
-		//if (event.type == "leave")
-			//console.log("leave");
 
-		//if (event.type == "input")
-			//console.log("input",ViewMediator.impl.getValue(event.target));
-
-
-
-		//else if (event.type == "focus")
-			//console.log("Form event "+event.type+" "+this.form$.name+" "+event.target.getAttribute("name"));
-
-		//else
-			//console.log("Form event "+event.type+" "+this.form$.name+" "+event.target.getAttribute("name")+" "+event.target.getAttribute("source"));
-
-		await EventQueue.DefaultEventQueue.getSlot();
-		BusinessEvents.send(event);
-
-		return(true);
+	/**
+	 * This method is called when a business event is propagated to this component.
+	 * It should be overridden by the inheriting class to handle the event.
+	 * @param event The business event to handle.
+	 */
+	protected async handleBusinessEvent(event:BusinessEvent) : Promise<void>
+	{
 	}
 }

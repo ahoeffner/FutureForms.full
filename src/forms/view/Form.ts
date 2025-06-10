@@ -1,7 +1,9 @@
 import { Section } from "./Section.js";
 import { Form as Model } from "../model/Form.js";
 import { Form as Parent } from "../../public/Form.js";
+import { BusinessEvent } from "../../events/BusinessEvent.js";
 import { Form as ViewComponent } from "../../components/Form.js";
+import { BusinessEvents } from "../../events/BusinessEvents.js";
 
 
 export class Form extends ViewComponent
@@ -24,6 +26,17 @@ export class Form extends ViewComponent
 	public set model(model:Model)
 	{
 		this.model$ = model;
+	}
+
+
+	/**
+	 * This method is called when a business event is propagated to this component.
+	 * @param event The business event to handle.
+	 * @returns {boolean} Returns true if the event was handled, false otherwise.
+	 */
+	protected async handleBusinessEvent(event:BusinessEvent) : Promise<void>
+	{
+		await BusinessEvents.send(event);
 	}
 
 
