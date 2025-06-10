@@ -97,6 +97,13 @@ export class Form implements ViewComponent
 		let field = event.target.getAttribute("name")?.toLocaleLowerCase();
 		let source = event.target.getAttribute("source")?.toLocaleLowerCase();
 
+		if (event.type === "input" && event.target.getAttribute("readonly"))
+		{
+			ViewMediator.impl.setValue(event.target,null);
+			return;
+		}
+
+
 		if (field && source)
 		{
 			if ((!row || isNaN(row)))
