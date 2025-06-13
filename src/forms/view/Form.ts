@@ -56,9 +56,9 @@ export class Form extends ViewComponent
 	 * @param event The business event to handle.
 	 * @returns {boolean} Returns true if the event was handled, false otherwise.
 	 */
-	protected async handleBusinessEvent(event:BusinessEvent) : Promise<void>
+	protected async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
-		await super.sendEvent(event);
+		return(await super.sendEvent(event));
 	}
 
 

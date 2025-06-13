@@ -111,24 +111,21 @@ export class Form implements ViewComponent
 			console.log("Remember name:",field,"source:",source,"row:",row,"value:",this.value$);
 		}
 
-		if (event.type == "input")
-		{
-			console.log(event.target,event.target == this.field$,event.target.hasAttribute("readonly"));
-		}
+		if (row != 0)
+			ViewMediator.impl.setValue(event.target,null);
 
-		if (event.target == this.field$ && event.target.hasAttribute("readonly"))
+		if (event.type == "input" && event.target == this.field$ && event.target.hasAttribute("readonly"))
 		{
 			console.log("Block event for readonly field",event.target);
 			ViewMediator.impl.setValue(event.target,this.value$);
 			return;
 		}
 
-
 		event.properties.set(Field.ROW,row);
 		event.properties.set(Field.FIELD,field);
 		event.properties.set(Field.SOURCE,source);
 
-		await this.handleBusinessEvent(event);
+		return(await this.handleBusinessEvent(event));
 	}
 
 
@@ -168,7 +165,8 @@ export class Form implements ViewComponent
 	 * It should be overridden by the inheriting class to handle the event.
 	 * @param event The business event to handle.
 	 */
-	protected async handleBusinessEvent(event:BusinessEvent) : Promise<void>
+	protected async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
+		return(true);
 	}
 }
