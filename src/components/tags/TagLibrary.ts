@@ -23,6 +23,7 @@ import { Tag } from "./Tag.js";
 import { Foreach } from "./Foreach.js";
 import { Component } from "./Component.js";
 import { Class } from '../../public/Class.js';
+import { Field } from "./Field.js";
 
 
 export class TagLibrary
@@ -48,6 +49,9 @@ export class TagLibrary
    {
       let tag:Tag = null;
       let tags:Map<string,Class<Tag>> = new Map<string,Class<Tag>>();
+
+      tag = new Field();
+      tags.set(tag.identifier?.toLowerCase(),Field);
 
       tag = new Foreach();
       tags.set(tag.identifier?.toLowerCase(),Foreach);

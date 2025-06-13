@@ -58,8 +58,7 @@ export class Form extends ViewComponent
 	 */
 	protected async handleBusinessEvent(event:BusinessEvent) : Promise<void>
 	{
-		console.log("Form.handleBusinessEvent",event.type);
-		await BusinessEvents.send(event);
+		await super.sendEvent(event);
 	}
 
 

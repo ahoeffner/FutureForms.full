@@ -21,6 +21,7 @@
 
 
 import { Parser } from "./Parser.js";
+import { Field } from "./tags/Field.js";
 import { Components } from "./Components.js";
 import { Form as Parent } from "../public/Form.js";
 import { EventQueue } from "../events/EventQueue.js";
@@ -39,6 +40,10 @@ export class Form implements ViewComponent
 	private form$:Parent = null;
 	private view$:HTMLElement = null;
 	private parent$:ViewComponent = null;
+	private parser$:Parser = new Parser();
+
+	private field$:any = null;
+	private value$:any = null;
 
 
    constructor(form:Parent)
@@ -82,49 +87,79 @@ export class Form implements ViewComponent
    public async setView(view:HTMLElement) : Promise<void>
    {
 		Components.remove(this);
-
-      let parser:Parser = new Parser();
-      await parser.parse(view);
+		await this.parser$.parse(view);
 
 		this.view$ = view;
 		Components.add(this);
+
+		this.parse();
    }
 
 
 	public async propagateBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
-		let row = +event.target.getAttribute("row");
-		let field = event.target.getAttribute("name")?.toLocaleLowerCase();
-		let source = event.target.getAttribute("source")?.toLocaleLowerCase();
+		let row = +event.target.getAttribute(Field.ROW);
+		let field = event.target.getAttribute(Field.NAME)?.toLocaleLowerCase();
+		let source = event.target.getAttribute(Field.SOURCE)?.toLocaleLowerCase();
 
-		if (event.type === "input" && event.target.getAttribute("readonly"))
+		console.log(event.type+" "+field)
+
+		if (event.type == "focus" && field && source)
 		{
-			ViewMediator.impl.setValue(event.target,null);
+			this.field$ = event.target;
+			this.value$ = ViewMediator.impl.getValue(event.target);
+			console.log("Remember name:",field,"source:",source,"row:",row,"value:",this.value$);
+		}
+
+		if (event.type == "input")
+		{
+			console.log(event.target,event.target == this.field$,event.target.hasAttribute("readonly"));
+		}
+
+		if (event.target == this.field$ && event.target.hasAttribute("readonly"))
+		{
+			console.log("Block event for readonly field",event.target);
+			ViewMediator.impl.setValue(event.target,this.value$);
 			return;
 		}
 
 
-		if (field && source)
-		{
-			if ((!row || isNaN(row)))
-				row = -1;
-		}
+		event.properties.set(Field.ROW,row);
+		event.properties.set(Field.FIELD,field);
+		event.properties.set(Field.SOURCE,source);
 
-		event.properties.set("row",row);
-		event.properties.set("field",field);
-		event.properties.set("source",source);
+		await this.handleBusinessEvent(event);
+	}
 
+
+	/**
+	 * This method is used to send a business event to the event queue.
+	 * It should be called by the inheriting class to trigger events to all listeners.
+	 * @param event The business event to send.
+	 * @returns {Promise<boolean>} Returns true if the event was sent successfully, false otherwise.
+	 */
+	public async sendEvent(event:BusinessEvent) : Promise<boolean>
+	{
 		try
 		{
 			await EventQueue.DefaultEventQueue.getSlot();
-			await this.handleBusinessEvent(event);
-			return(true);
+			let result:boolean = await BusinessEvents.send(event);
+			return(result);
 		}
 		catch (error)
 		{
 			console.error("Error handling business event:", error);
 			return(false);
 		}
+	}
+
+
+	/**
+	 * This method is called when the components view is changed.
+	 * It should be overridden by the inheriting class to handle form definition.
+	 */
+	protected async parse() : Promise<void>
+	{
 	}
 
 

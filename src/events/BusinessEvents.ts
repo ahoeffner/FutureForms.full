@@ -114,7 +114,7 @@ export class BusinessEvents implements EventListenerObject
 	 * Send a business event
 	 * @param event
 	 */
-	public static async send(event:BusinessEvent) : Promise<void>
+	public static async send(event:BusinessEvent) : Promise<boolean>
 	{
 		let lsnrs:Listener[] = []; // Listeners
 		let chits:Listener[] = [];	// Component listener hits
@@ -165,10 +165,12 @@ export class BusinessEvents implements EventListenerObject
 			try
 			{
 				if (!await this.invoke(lsnrs[i].destination,event))
-					break;
+					return(false);
 			}
 			catch (error) {break;}
 		}
+
+		return(true);
 	}
 
 

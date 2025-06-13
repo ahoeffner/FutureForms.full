@@ -51,22 +51,6 @@ export class Parser
 	}
 
 
-   public getUsedTags() : Class<Tag>[]
-   {
-      let tags:Class<Tag>[] = [];
-      this.tags$.forEach((_tags, clazz) => tags.push(clazz));
-      return(tags);
-   }
-
-
-   public getUsedComponentTags() : Class<Tag>[]
-   {
-      let tags:Class<Tag>[] = [];
-      this.comps$.forEach((_tags, clazz) => tags.push(clazz));
-      return(tags);
-   }
-
-
    public getTags(clazz:Class<Tag>) : Tag[]
    {
       return(this.tags$.get(clazz));
