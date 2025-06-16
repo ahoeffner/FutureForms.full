@@ -21,8 +21,8 @@
 
 
 import { Form as View} from "../forms/view/Form.js";
-import { Form as Model} from "../forms/model/Form.js";
 import { FormEventFilter } from "../events/FormEvent.js";
+import { Form as Model, Validation} from "../forms/model/Form.js";
 import { BusinessEvents, Listener } from "../events/BusinessEvents.js";
 import { Destination, EventHandler } from "../events/BusinessEventListener.js";
 
@@ -63,11 +63,12 @@ export class Form
 	}
 
 
-	public setValue(name:string, row:number ,value:any, validate:boolean = true) : void
+	public async setValue(name:string, row:number ,value:any, validate:Validation = Validation.None) : Promise<boolean>
 	{
-		this.model$.setValue(name,row,value,validate);
+		return(this.model$.setValue(name,row,value,validate));
 	}
 
+	
 	public addTrigger(destination:EventHandler|Destination|any, filter:FormEventFilter) : Listener
 	{
 		if (destination == null)

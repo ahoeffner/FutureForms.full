@@ -24,7 +24,6 @@ import { Section } from "./Section.js";
 import { Form as Model } from "../model/Form.js";
 import { Form as Parent } from "../../public/Form.js";
 import { BusinessEvent } from "../../events/BusinessEvent.js";
-import { BusinessEvents } from "../../events/BusinessEvents.js";
 import { Form as ViewComponent } from "../../components/Form.js";
 
 
@@ -51,14 +50,6 @@ export class Form extends ViewComponent
 	}
 
 
-	public setValue(name:string, row:number ,value:any, validate:boolean = true) : void
-	{
-		this.model$.setValue(name,row,value,validate);
-	}
-
-
-
-
 	/**
 	 * This method is called when a business event is propagated to this component.
 	 * @param event The business event to handle.
@@ -66,6 +57,11 @@ export class Form extends ViewComponent
 	 */
 	protected async handleBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
+		if (event.type == "input" && (row == crow || row == -1))
+		{
+			await this.model.setValue(field,row,value,Validation.Delayed);
+		}
+
 		return(await super.sendEvent(event));
 	}
 

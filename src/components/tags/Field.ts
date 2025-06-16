@@ -28,6 +28,7 @@ export class Field extends Tag
 	public static readonly NAME:string = "name";
 	public static readonly FIELD:string = "field";
 	public static readonly SOURCE:string = "source";
+	public static readonly AUTOCOMPLETE:string = "autocomplete";
 
 	public identifier:string = Field.SOURCE;
 

@@ -29,6 +29,7 @@ import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 import { BusinessEvent } from "../events/BusinessEvent.js";
 import { BusinessEvents } from "../events/BusinessEvents.js";
+import { Validation } from "../forms/model/Form.js";
 
 
 /**
@@ -112,7 +113,10 @@ export class Form implements ViewComponent
 
 		let auto:boolean = false;
 		if (event.type == "input")
+		{
 			auto = ViewMediator.impl.detectAutoComplete();
+			if (event.target == this.field$) auto = false;
+		}
 
 		if (event.type == "focus" && field && source)
 		{
@@ -126,19 +130,16 @@ export class Form implements ViewComponent
 			return;
 		}
 
-		if (event.type == "input" && (row == crow || row == -1))
-		{
-			this.form$.setValue(field,row,value,auto);
-		}
-
 		if (event.type == "input" && (row != -1 && row != crow))
 		{
 			ViewMediator.impl.setValue(event.target,null);
+			return;
 		}
 
 		event.properties.set(Field.ROW,row);
 		event.properties.set(Field.FIELD,field);
 		event.properties.set(Field.SOURCE,source);
+		event.properties.set(Field.AUTOCOMPLETE,auto);
 
 		return(await this.handleBusinessEvent(event));
 	}

@@ -55,8 +55,17 @@ export class Form
 	}
 
 
-	public setValue(name:string, row:number ,value:any, validate:boolean = true) : void
+	public async setValue(name:string, row:number ,value:any, validate:Validation = Validation.None) : Promise<boolean>
 	{
 		console.log("setValue",name,row,value,validate);
+		return(true);
 	}
+}
+
+
+export enum Validation
+{
+	None,
+	Delayed,
+	Required
 }
