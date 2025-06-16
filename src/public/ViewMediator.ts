@@ -382,4 +382,14 @@ export class ViewMediator
 	{
 		element.children.item(element.children.length-1).remove();
 	}
+
+
+	private change:number = 0
+	public detectAutoComplete() : boolean
+	{
+		let auto:boolean = false;
+		if (Date.now() - this.change < 10) auto = true;
+		this.change = Date.now();
+		return(auto);
+	}
 }

@@ -63,6 +63,11 @@ export class Form
 	}
 
 
+	public setValue(name:string, row:number ,value:any, validate:boolean = true) : void
+	{
+		this.model$.setValue(name,row,value,validate);
+	}
+
 	public addTrigger(destination:EventHandler|Destination|any, filter:FormEventFilter) : Listener
 	{
 		if (destination == null)

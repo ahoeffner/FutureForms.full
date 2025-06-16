@@ -99,26 +99,41 @@ export class Form implements ViewComponent
 	public async propagateBusinessEvent(event:BusinessEvent) : Promise<boolean>
 	{
 		let row = +event.target.getAttribute(Field.ROW);
+		let crow = +this.field$?.getAttribute(Field.ROW);
+		let value = ViewMediator.impl.getValue(event.target);
 		let field = event.target.getAttribute(Field.NAME)?.toLocaleLowerCase();
 		let source = event.target.getAttribute(Field.SOURCE)?.toLocaleLowerCase();
 
-		console.log(event.type+" "+field)
+		if (Number.isNaN(row))
+			row = -1;
+
+		if (Number.isNaN(crow))
+			crow = -1;
+
+		let auto:boolean = false;
+		if (event.type == "input")
+			auto = ViewMediator.impl.detectAutoComplete();
 
 		if (event.type == "focus" && field && source)
 		{
+			this.value$ = value;
 			this.field$ = event.target;
-			this.value$ = ViewMediator.impl.getValue(event.target);
-			console.log("Remember name:",field,"source:",source,"row:",row,"value:",this.value$);
 		}
-
-		if (row != 0)
-			ViewMediator.impl.setValue(event.target,null);
 
 		if (event.type == "input" && event.target == this.field$ && event.target.hasAttribute("readonly"))
 		{
-			console.log("Block event for readonly field",event.target);
 			ViewMediator.impl.setValue(event.target,this.value$);
 			return;
+		}
+
+		if (event.type == "input" && (row == crow || row == -1))
+		{
+			this.form$.setValue(field,row,value,auto);
+		}
+
+		if (event.type == "input" && (row != -1 && row != crow))
+		{
+			ViewMediator.impl.setValue(event.target,null);
 		}
 
 		event.properties.set(Field.ROW,row);
@@ -149,7 +164,6 @@ export class Form implements ViewComponent
 			return(false);
 		}
 	}
-
 
 	/**
 	 * This method is called when the components view is changed.

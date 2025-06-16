@@ -53,4 +53,10 @@ export class Form
 	{
 		this.view$ = form;
 	}
+
+
+	public setValue(name:string, row:number ,value:any, validate:boolean = true) : void
+	{
+		console.log("setValue",name,row,value,validate);
+	}
 }

@@ -51,6 +51,14 @@ export class Form extends ViewComponent
 	}
 
 
+	public setValue(name:string, row:number ,value:any, validate:boolean = true) : void
+	{
+		this.model$.setValue(name,row,value,validate);
+	}
+
+
+
+
 	/**
 	 * This method is called when a business event is propagated to this component.
 	 * @param event The business event to handle.
