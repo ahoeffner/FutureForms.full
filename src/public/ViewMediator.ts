@@ -384,11 +384,16 @@ export class ViewMediator
 	}
 
 
-	private change:number = 0
+	private change:number = 0;
+	public AUTOCOMPLETEDELAY:number = 10; // milliseconds
+
 	public detectAutoComplete() : boolean
 	{
 		let auto:boolean = false;
-		if (Date.now() - this.change < 10) auto = true;
+
+		if (Date.now() - this.change < this.AUTOCOMPLETEDELAY)
+			auto = true;
+		
 		this.change = Date.now();
 		return(auto);
 	}

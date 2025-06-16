@@ -16,6 +16,8 @@ export { Filter, Filters, NameValuePair } from 'futureforms';
 
 
 export { Tag } from './src/components/tags/Tag.js';
+export { Field } from './src/components/tags/Field.js';
+
 export { Parser } from './src/components/Parser.js';
 export { Component } from './src/components/tags/Component.js';
 export { TagLibrary } from './src/components/tags/TagLibrary.js';

@@ -57,7 +57,7 @@ export class Form
 
 	public async setValue(name:string, row:number ,value:any, validate:Validation = Validation.None) : Promise<boolean>
 	{
-		console.log("setValue",name,row,value,validate);
+		console.log("setValue",name,row,value,Validation[validate]);
 		return(true);
 	}
 }

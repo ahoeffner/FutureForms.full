@@ -29,7 +29,6 @@ import { ViewMediator } from "../public/ViewMediator.js";
 import { ViewComponent } from "../public/ViewComponent.js";
 import { BusinessEvent } from "../events/BusinessEvent.js";
 import { BusinessEvents } from "../events/BusinessEvents.js";
-import { Validation } from "../forms/model/Form.js";
 
 
 /**
@@ -138,6 +137,7 @@ export class Form implements ViewComponent
 
 		event.properties.set(Field.ROW,row);
 		event.properties.set(Field.FIELD,field);
+		event.properties.set(Field.VALUE,value);
 		event.properties.set(Field.SOURCE,source);
 		event.properties.set(Field.AUTOCOMPLETE,auto);
 

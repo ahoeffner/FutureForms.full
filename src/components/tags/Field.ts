@@ -27,6 +27,7 @@ export class Field extends Tag
 	public static readonly ROW:string = "row";
 	public static readonly NAME:string = "name";
 	public static readonly FIELD:string = "field";
+	public static readonly VALUE:string = "value";
 	public static readonly SOURCE:string = "source";
 	public static readonly AUTOCOMPLETE:string = "autocomplete";
 
