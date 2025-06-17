@@ -19,6 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import { Source } from './Source.js';
 import { Form as Parent } from '../../public/Form.js';
 import { Form as ViewForm } from '../../components/Form.js';
 
@@ -55,10 +56,19 @@ export class Form
 	}
 
 
-	public async setValue(name:string, row:number ,value:any, validate:Validation = Validation.None) : Promise<boolean>
+	public async getValue(source:string, name:string, offset:number = 0) : Promise<any>
 	{
-		console.log("setValue",name,row,value,Validation[validate]);
-		return(true);
+		let ds:Source = this.parent.getSource(source);
+		if (ds === null) throw new Error(`Source '${source}' not found in form '${this.parent.name}'`);
+		return(ds.getValue(name,offset));
+	}
+
+
+	public async setValue(source:string, name:string, offset:number, value:any, validate:Validation = Validation.None) : Promise<boolean>
+	{
+		let ds:Source = this.parent.getSource(source);
+		if (ds === null) throw new Error(`Source '${source}' not found in form '${this.parent.name}'`);
+		return(ds.setValue(name,offset,value,validate));
 	}
 }
 

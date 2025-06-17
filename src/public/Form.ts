@@ -20,6 +20,7 @@
 */
 
 
+import { Source } from "../forms/model/Source.js";
 import { Form as View} from "../forms/view/Form.js";
 import { FormEventFilter } from "../events/FormEvent.js";
 import { Form as Model, Validation} from "../forms/model/Form.js";
@@ -31,6 +32,14 @@ export class Form
 {
 	private view$:View;
 	private model$:Model;
+
+	/**
+	 * A map of sources used by the form.
+	 * The key is the name of the source, and the value is the source object.
+   */
+	private sources$:Map<string,Source> =
+		new Map<string,Source>();
+
 
 
    constructor(view?:HTMLElement)
@@ -63,12 +72,24 @@ export class Form
 	}
 
 
-	public async setValue(name:string, row:number ,value:any, validate:Validation = Validation.None) : Promise<boolean>
+	public getSource(name:string) : Source
 	{
-		return(this.model$.setValue(name,row,value,validate));
+		return(this.sources$.get(name));
 	}
 
-	
+
+	public addSource(name:string, source:Source) : void
+	{
+  		this.sources$.set(name,source);
+ 	}
+
+
+	public async setValue(source:string, name:string, row:number ,value:any, validate:Validation = Validation.None) : Promise<boolean>
+	{
+		return(this.model$.setValue(source,name,row,value,validate));
+	}
+
+
 	public addTrigger(destination:EventHandler|Destination|any, filter:FormEventFilter) : Listener
 	{
 		if (destination == null)

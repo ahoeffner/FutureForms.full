@@ -21,17 +21,19 @@
 
 
 import { Section } from "./Section.js";
-import { Form as Model, Validation } from "../model/Form.js";
 import { Form as Parent } from "../../public/Form.js";
 import { Field } from "../../components/tags/Field.js";
+import { Form as Model, Validation } from "../model/Form.js";
 import { BusinessEvent } from "../../events/BusinessEvent.js";
 import { Form as ViewComponent } from "../../components/Form.js";
 
 
 export class Form extends ViewComponent
 {
+	private offset:number = 0;
 	private model$:Model = null;
 	private sections:Map<string,Section> = new Map<string,Section>();
+
 
 	constructor(parent:Parent)
 	{
@@ -61,13 +63,14 @@ export class Form extends ViewComponent
 		let row:number 	= event.properties.get(Field.ROW);
 		let value:any 		= event.properties.get(Field.VALUE);
 		let field:string 	= event.properties.get(Field.FIELD);
+		let source:string = event.properties.get(Field.SOURCE);
 
 		if (event.type == "input")
 		{
 			let success:boolean = await super.sendEvent(event);
 			if (!success) return(false);
 
-			await this.model.setValue(field,row,value,Validation.Delayed);
+			await this.model.setValue(source,field,row+this.offset,value,Validation.Delayed);
 			return(true);
 		}
 

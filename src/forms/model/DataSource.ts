@@ -19,16 +19,38 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Validation } from "./Form";
+import { Record } from "./Record.js";
+import { Source } from "./Source.js";
+import { Validation } from "./Form.js";
 
 
-/**
- * The Source class represents a source of data used
- * by a section in the form
- */
-export abstract class Source
+export class DataSource extends Source
 {
-	abstract get name() : string;
-	abstract getValue(name:string, record:number) : Promise<any>;
-	abstract setValue(name:string, record:number, value:any, validate:Validation) : Promise<boolean>;
+	private name$:string = null;
+	private records$:Record[] = [];
+
+
+	constructor(name:string)
+	{
+		super();
+		this.name$ = name.toLowerCase();
+	}
+
+	public get name() : string
+	{
+		return(this.name$);
+	}
+
+
+	public getValue(name:string, offset:number = 0): Promise<any>
+	{
+		throw new Error("Method not implemented.");
+	}
+
+
+	public async setValue(name:string, offset:number, value:any, validate:Validation) : Promise<boolean>
+	{
+		console.log("setValue",name,offset,value,Validation[validate]);
+		return(true);
+	}
 }
