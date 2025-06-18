@@ -19,7 +19,7 @@
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { Source } from './Source.js';
+import { Record } from "./Record.js";
 import { Form as Parent } from '../../public/Form.js';
 import { Form as ViewForm } from '../../components/Form.js';
 
@@ -33,6 +33,10 @@ export class Form
 {
 	private parent$:Parent = null;
 	private view$:ViewForm = null;
+
+	private sources$:Map<string,Source> =
+		new Map<string,Source>();
+
 
 
 	constructor(parent:Parent)
@@ -58,17 +62,30 @@ export class Form
 
 	public async getValue(source:string, name:string, offset:number = 0) : Promise<any>
 	{
-		let ds:Source = this.parent.getSource(source);
-		if (ds === null) throw new Error(`Source '${source}' not found in form '${this.parent.name}'`);
+		let ds:Source = this.getSource(source);
 		return(ds.getValue(name,offset));
 	}
 
 
 	public async setValue(source:string, name:string, offset:number, value:any, validate:Validation = Validation.None) : Promise<boolean>
 	{
-		let ds:Source = this.parent.getSource(source);
-		if (ds === null) throw new Error(`Source '${source}' not found in form '${this.parent.name}'`);
+		let ds:Source = this.getSource(source);
 		return(ds.setValue(name,offset,value,validate));
+	}
+
+
+	private getSource(name:string) : Source
+	{
+		name = name?.toLowerCase();
+		let source:Source = this.sources$.get(name);
+
+		if (source === undefined)
+		{
+			source = new Source();
+			this.sources$.set(name,source);
+		}
+
+		return(source);
 	}
 }
 
@@ -78,4 +95,34 @@ export enum Validation
 	None,
 	Delayed,
 	Required
+}
+
+
+class Source
+{
+	private records$:Map<number,Record> =
+		new Map<number,Record>();
+
+
+	public getValue(name:string, offset:number) : Promise<any>
+	{
+		let record:Record = this.records$.get(offset);
+		if (!record) return(null);
+		return(record.getField(name).getVolatileValue());
+	}
+
+
+	public async setValue(name:string, offset:number, value:any, validate:Validation) : Promise<boolean>
+	{
+		let record:Record = this.records$.get(offset);
+
+		if (!record)
+		{
+			record = new Record();
+			this.records$.set(offset,record);
+		}
+
+		record.setValue(name,value);
+		return(true);
+	}
 }

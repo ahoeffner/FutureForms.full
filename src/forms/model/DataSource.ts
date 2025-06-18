@@ -27,7 +27,9 @@ import { Validation } from "./Form.js";
 export class DataSource extends Source
 {
 	private name$:string = null;
-	private records$:Record[] = [];
+
+	private records$:Map<number,Record> =
+		new Map<number,Record>();
 
 
 	constructor(name:string)
@@ -42,15 +44,25 @@ export class DataSource extends Source
 	}
 
 
-	public getValue(name:string, offset:number = 0): Promise<any>
+	public getValue(name:string, offset:number) : Promise<any>
 	{
-		throw new Error("Method not implemented.");
+		let record:Record = this.records$.get(offset);
+		if (!record) return(null);
+		return(record.getField(name).getVolatileValue());
 	}
 
 
 	public async setValue(name:string, offset:number, value:any, validate:Validation) : Promise<boolean>
 	{
-		console.log("setValue",name,offset,value,Validation[validate]);
+		let record:Record = this.records$.get(offset);
+
+		if (!record)
+		{
+			record = new Record();
+			this.records$.set(offset,record);
+		}
+
+		record.setValue(name,value);
 		return(true);
 	}
 }

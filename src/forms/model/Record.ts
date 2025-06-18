@@ -33,31 +33,13 @@ export class Record
 
 
    /**
-    * Runs the validation triggers, and if success, marks the field validated
-    * @returns The outcome
-    */
-   public async validate() : Promise<boolean>
-   {
-      for (let [_name,field] of this.fields$)
-      {
-         if (!await field.validate())
-            return(false);
-      }
-
-      // Fire a trigger
-      return(true);
-   }
-
-
-   /**
     * Sets the validation status
-    * @param flag True or false
     * @returns Itself
     */
-   public setValidated(flag:boolean) : Record
+   public setValidated() : Record
    {
       for (let [_name,field] of this.fields$)
-         field.setValidated(flag);
+         field.setValidated();
 
       return(this);
    }
@@ -80,23 +62,16 @@ export class Record
 
    /**
     * @param field : The field or name of field
-    * @returns Itself
+    * @returns The field
     */
-   public createField(field:Field|string, value?:any) : Record
+   public addField(field:string, value?:any) : Field
    {
-      if (field instanceof Field)
-      {
-         field.setValue(value);
-         this.fields$.set(field.name.toLowerCase(),field);
-         return(this);
-      }
-
       let name:string = field.toLowerCase();
 
       let fld:Field = new Field(field,value);
       this.fields$.set(name,fld);
 
-      return(this);
+      return(fld);
    }
 
 
@@ -126,4 +101,24 @@ export class Record
       let name:string = field.toLowerCase();
       return(this.fields$.get(name));
    }
+
+
+	/**
+	 *
+	 * If the field does not exist, it will be created.
+	 * @param field : Name of field
+	 * @param value : Value to set
+	 * @description This method sets the value of a field in the record.
+	 * @returns Itself
+	 */
+	public setValue(field:string, value:any) : Record
+	{
+		let name:string = field.toLowerCase();
+		let fld:Field = this.fields$.get(name);
+
+		if (fld) fld.setValue(value);
+		else fld = this.addField(name,value);
+
+		return(this);
+	}
 }

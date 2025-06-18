@@ -93,36 +93,13 @@ export class Field
 
 
    /**
-    * Runs the validation triggers, and if success, marks the field validated
-    * @returns The outcome
-    */
-   public async validate() : Promise<boolean>
-   {
-      if (this.valid$) return(true);
-
-      // Fire a trigger
-      this.valid$ = true;
-      this.value$.validated = this.value$.original;
-      return(true);
-   }
-
-
-   /**
     * Sets the validation status
-    * @param flag True or false
     * @returns Itself
     */
-   public setValidated(flag:boolean) : Field
+   public setValidated() : Field
    {
-      if (flag)
-      {
-         this.valid$ = true;
-         this.value$.validated = this.value$.original;
-      }
-      else
-      {
-         this.valid$ = false;
-      }
+		this.valid$ = true;
+		this.value$.validated = this.value$.volatile;
 
       return(this);
    }

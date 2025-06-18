@@ -130,10 +130,7 @@ export class Form implements ViewComponent
 		}
 
 		if (event.type == "input" && (row != -1 && row != crow))
-		{
-			ViewMediator.impl.setValue(event.target,null);
-			return;
-		}
+			event = new BusinessEvent("undo",event.component,event.target,event.properties);
 
 		event.properties.set(Field.ROW,row);
 		event.properties.set(Field.FIELD,field);
@@ -166,6 +163,19 @@ export class Form implements ViewComponent
 		}
 	}
 
+
+	public getValue(field:HTMLElement) : any
+	{
+		return(ViewMediator.impl.getValue(field));
+	}
+
+
+	public setValue(field:HTMLElement, value:any) : void
+	{
+		ViewMediator.impl.setValue(field,value);
+	}
+
+	
 	/**
 	 * This method is called when the components view is changed.
 	 * It should be overridden by the inheriting class to handle form definition.
