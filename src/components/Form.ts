@@ -105,10 +105,18 @@ export class Form implements ViewComponent
 		let source = event.target.getAttribute(Field.SOURCE)?.toLocaleLowerCase();
 
 		if (Number.isNaN(row))
-			row = -1;
+			row = null;
 
 		if (Number.isNaN(crow))
-			crow = -1;
+			crow = null;
+
+		if (field == null || source == null)
+		{
+			row = null;
+			field = null;
+			value = null;
+			source = null;
+		}
 
 		let auto:boolean = false;
 		if (event.type == "input")
@@ -129,7 +137,7 @@ export class Form implements ViewComponent
 			return;
 		}
 
-		if (event.type == "input" && (row != -1 && row != crow))
+		if (event.type == "input" && (row != null && row != crow))
 			event = new BusinessEvent("undo",event.component,event.target,event.properties);
 
 		event.properties.set(Field.ROW,row);
@@ -175,7 +183,7 @@ export class Form implements ViewComponent
 		ViewMediator.impl.setValue(field,value);
 	}
 
-	
+
 	/**
 	 * This method is called when the components view is changed.
 	 * It should be overridden by the inheriting class to handle form definition.

@@ -29,7 +29,8 @@ import { Form as ViewComponent } from "../../components/Form.js";
 
 export class Form extends ViewComponent
 {
-	private offset:number = 0;
+	private offset$:number = 0;
+	private current$:number = 0;
 	private model$:Model = null;
 
 
@@ -63,10 +64,13 @@ export class Form extends ViewComponent
 		let field:string 	= event.properties.get(Field.FIELD);
 		let source:string = event.properties.get(Field.SOURCE);
 
+		if (event.type == "focus" && row != null)
+			this.current$ = row;
+
 		if (event.type == "undo")
 		{
-			let value:any = await this.model.getValue(source,field,row+this.offset);
-			super.setValue(event.target,value);
+			let value:any = await this.model.getValue(source,field,row+this.offset$);
+			this.distribute(source,field,row+this.offset$,value);
 			return(true);
 		}
 
@@ -75,10 +79,32 @@ export class Form extends ViewComponent
 			let success:boolean = await super.sendEvent(event);
 			if (!success) return(false);
 
-			await this.model.setValue(source,field,row+this.offset,value,Validation.Delayed);
+			this.distribute(source,field,row+this.offset$,value);
+			await this.model.setValue(source,field,row+this.offset$,value,Validation.Delayed);
 			return(true);
 		}
 
 		return(await super.sendEvent(event));
+	}
+
+
+	public distribute(source:string, field:string, row:number, value:any) : void
+	{
+		if (row == null)
+			row = this.current$;
+
+		this.getView().querySelectorAll("[source='"+source+"' i][name='"+field+"' i]").forEach((element:HTMLElement) =>
+		{
+			let frow:number = this.current$;
+
+			if (element.hasAttribute("row"))
+			{
+				frow = parseInt(element.getAttribute("row"));
+				if (Number.isNaN(frow)) frow = null;
+			}
+
+			if (frow == row || frow == null)
+				super.setValue(element,value);
+		})
 	}
 }
