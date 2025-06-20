@@ -20,8 +20,8 @@
 */
 
 import { Record } from "./Record.js";
+import { Form as ViewForm } from '../view/Form.js';
 import { Form as Parent } from '../../public/Form.js';
-import { Form as ViewForm } from '../../components/Form.js';
 
 
 /**
@@ -67,10 +67,12 @@ export class Form
 	}
 
 
-	public async setValue(source:string, name:string, offset:number, value:any, validate:Validation = Validation.None) : Promise<boolean>
+	public async setValue(source:string, name:string, record:number, value:any, validate:Validation = Validation.None, evsrc:HTMLElement = null) : Promise<boolean>
 	{
 		let ds:Source = this.getSource(source);
-		return(ds.setValue(name,offset,value,validate));
+		let row:number = record - this.view$.offset;
+		this.view$.distribute(source,name,row,value,evsrc);
+		return(ds.setValue(name,record,value,validate));
 	}
 
 

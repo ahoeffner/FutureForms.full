@@ -52,6 +52,12 @@ export class Form extends ViewComponent
 	}
 
 
+	public get offset() : number
+	{
+		return(this.offset$);
+	}
+
+
 	/**
 	 * This method is called when a business event is propagated to this component.
 	 * @param event The business event to handle.
@@ -65,12 +71,16 @@ export class Form extends ViewComponent
 		let source:string = event.properties.get(Field.SOURCE);
 
 		if (event.type == "focus" && row != null)
+		{
 			this.current$ = row;
+			this.setCurrent(source,row);
+		}
 
 		if (event.type == "undo")
 		{
-			let value:any = await this.model.getValue(source,field,row+this.offset$);
-			this.distribute(source,field,row+this.offset$,value);
+			let record:number = row + this.offset$;
+			let value:any = await this.model.getValue(source,field,record);
+			this.distribute(source,field,row,value,event.target);
 			return(true);
 		}
 
@@ -79,8 +89,8 @@ export class Form extends ViewComponent
 			let success:boolean = await super.sendEvent(event);
 			if (!success) return(false);
 
-			this.distribute(source,field,row+this.offset$,value);
-			await this.model.setValue(source,field,row+this.offset$,value,Validation.Delayed);
+			let record:number = row + this.offset$;
+			await this.model.setValue(source,field,record,value,Validation.Delayed,event.target);
 			return(true);
 		}
 
@@ -88,23 +98,42 @@ export class Form extends ViewComponent
 	}
 
 
-	public distribute(source:string, field:string, row:number, value:any) : void
+	public distribute(source:string, field:string, row:number, value:any, evsrc:HTMLElement) : void
 	{
 		if (row == null)
 			row = this.current$;
 
-		this.getView().querySelectorAll("[source='"+source+"' i][name='"+field+"' i]").forEach((element:HTMLElement) =>
+		this.getView().querySelectorAll("[source='"+source+"' i][name='"+field+"' i]").forEach((elem:HTMLElement) =>
 		{
-			let frow:number = this.current$;
+			let frow:number = null;
 
-			if (element.hasAttribute("row"))
+			if (elem.hasAttribute("row"))
 			{
-				frow = parseInt(element.getAttribute("row"));
+				frow = parseInt(elem.getAttribute("row"));
 				if (Number.isNaN(frow)) frow = null;
 			}
 
-			if (frow == row || frow == null)
-				super.setValue(element,value);
+			if (frow == row || (frow == null && row == this.current$))
+			{
+				if (elem != evsrc)
+					super.setValue(elem,value);
+			}
 		})
+	}
+
+
+	private async setCurrent(source:string, row:number) : Promise<void>
+	{
+		let value:any = null;
+		let record:number = row + this.offset$;
+		let elements:NodeListOf<HTMLElement> = this.getView().querySelectorAll("[source='"+source+"' i]:not([row])");
+
+		for (let i = 0; i < elements.length; i++)
+		{
+			let elem:HTMLElement = elements[i];
+			let name:string = elem.getAttribute("name");
+			value = await this.model.getValue(source,name,record);
+			super.setValue(elem,value);
+		}
 	}
 }
